@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip --version)",
+      "Bash(pip install:*)",
+      "Bash(python -c \"import torch; print\\(torch.__version__\\)\")",
+      "Bash(python3 -c \"import torch; print\\(torch.__version__\\)\")",
+      "Bash(/c/Users/Marcelino/AppData/Local/Programs/Python/Python312/python -c \"import torch; print\\(torch.__version__\\)\")",
+      "Bash(python -c \"import torch; print\\(''''torch'''', torch.__version__\\)\")",
+      "Read(//c/Python314//**)",
+      "Bash(/c/Python314/python.exe --version)",
+      "Bash(/c/Python314/python.exe -c \"import torch; print\\(torch.__version__\\)\")",
+      "Bash(/c/Python314/python.exe -c \":*)",
+      "WebFetch(domain:gateway.www.olg.ca)",
+      "WebFetch(domain:gateway.can2.mkodo.io)",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ]
+  }
+}
