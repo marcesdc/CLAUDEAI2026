@@ -1,0 +1,14 @@
+{
+  "arch": "transformer",
+  "EMBED_DIM": 64,
+  "NUM_LAYERS": 2,
+  "FF_DIM": 512,
+  "DROPOUT": 0.2,
+  "LR": 0.003,
+  "WEIGHT_DECAY": 0.001,
+  "BATCH_SIZE": 64,
+  "SEQUENCE_LEN": 15,
+  "PATIENCE": 8,
+  "EPOCHS": 75,
+  "NUM_HEADS": 4
+}
