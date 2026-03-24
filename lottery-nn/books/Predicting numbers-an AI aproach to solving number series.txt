@@ -1,0 +1,92 @@
+Predicting Numbers:
+An AI Approach to Solving Number Series
+Marco Ragni and Andreas Klein
+Center for Cognitive Science,
+Friedrichstr. 50, 79098 Freiburg, Germany
+{ragni,klein}@cognition.uni-freiburg.de
+Abstract. Solving number series poses a challenging problem for hu-
+mans and Artiﬁcial Intelligence Systems. The task is to correctly predict
+the next number in a given series, in accordance with a pattern inher-
+ent to that series. We propose a novel method based on Artiﬁcial Neural
+Networks with a dynamic learning approach to solve number series prob-
+lems. Our method is evaluated on an own experiment and over 50.000
+number series from the Online Encyclopedia of Integer Sequences (OEIS)
+database.
+1
+Introduction
+Identifying the pattern in a number series can pose serious problems for human
+and artiﬁcial reasoning systems. Take, for example:
+(i) 5, 7, 9, 11, 13, . . .
+(ii) 2, 5, 9, 19, 37, 75, 149, 299, . . .
+The ﬁrst problem is easy to solve and requires only the addition of 2, while
+the second problem requires the application of the function an := 2an−1 +
+(−1)n on a1 := 2 and is, as we will see, diﬃcult for humans and for ANNs.
+Number series problems are interesting for Artiﬁcial Intelligence as principally
+any computable function can be hidden and the set of operators is not necessarily
+restricted to +, −, ×. Number series problems are used in intelligence tests for
+determining mathematical pattern-recognition capabilitiess. Especially the latter
+aspect identifying patterns is an important aspect of any intelligent system, and
+can provide a fruitful benchmark for general approaches. There is an Online
+Encyclopedia of Integer Sequences [1,9] (OEIS) and a journal dedicated to the
+study of integer sequences [2].
+In the following, we propose a method using artiﬁcial neural networks (ANNs)
+and a novel dynamic approach to solve number series problems. We compare
+our approach with human performance in solving number series problems and
+use the OEIS database for benchmarking. Finally, we discuss the results and
+performance and provide a short outlook of our further work.
+J. Bach and S. Edelkamp (Eds.): KI 2011, LNAI 7006, pp. 255–259, 2011.
+c
+⃝Springer-Verlag Berlin Heidelberg 2011
+
+256
+M. Ragni and A. Klein
+Table 1. Pattern generation example for an ANN using the dynamic approach with
+three input nodes and a number series of seven given numbers (n1, ..., n7) with the n8–
+th to predict. Four patterns (p1, ..., p4) are used for training, each with three training
+values (vi, vi+1, vi+2) and one target value t = ni+3. One pattern (p5) is used for testing
+the ANN without a target value.
+Pattern n1 n2 n3 n4 n5 n6 n7 n8
+p1
+v1 v2 v3 t
+p2
+v2 v3 v4 t
+p3
+v3 v4 v5 t
+p4
+v4 v5 v6 t
+p5
+v5 v6 v7 ?
+2
+Using a Dynamic Learning Approach
+For our attempt to solve number series with artiﬁcial neural networks [3], we
+use three–layered networks with error back-propagation and hyperbolic tangent
+as activation. We used fi =
+n
+10len(n) as input function for the network and the
+inverse, fo = f −1
+i
+, as output function of the network. The weights were initially
+randomly assigned with values between zero and one. A momentum factor of 0.1
+was used.
+For data analysis, we systematically varied the learning rate, the number of
+input nodes, the number of hidden nodes and the number of training iterations.
+These variations should allow for a comparison of the diﬀerent ANNs with em-
+pirical results. For all conﬁgurations only one output node was used.
+To generate patterns for training and testing a network, we built patterns as
+tuples of training values and one target value. The number of training values
+of a pattern is equivalent to the number of input nodes m of the network used.
+Starting with the ﬁrst number, a subsequence of training values was shifted
+through the number series. As corresponding target value, the next number of
+the subsequence was used (cf. Table 1).
+Since the last given value of the number series with length n remains as target
+value and we need at least one training and one test pattern, the maximum
+length of a subsequence of training values for a pattern is n −2. Hence, for a
+network conﬁguration with m input nodes exactly n−m patterns were generated.
+Consequently, the ﬁrst (n −m) −1 patterns were used for training, while the
+last one remained for testing and thus predicting the last given number of the
+sequence. Therefore, the last given number of the number series - the main target
+value - was never used for training.
+The training of the network was iterated on the patterns for a various number
+of times. After training the network we tested the learning result with the last
+pattern without a given target value and compared the prediction with the actual
+value.
