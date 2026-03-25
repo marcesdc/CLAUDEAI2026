@@ -130,6 +130,49 @@ C:\Python314\python.exe agent/run.py watch
 
 **Dependencies**: `pip install claude-agent-sdk anyio` + Node.js/npx for Playwright.
 
+## Swarm System (Phase 1 — complete)
+
+Three lotteries share one transformer backbone trained jointly. Entry point: `main_swarm.py`.
+
+**Swarm commands:**
+```bash
+# Joint-train all 3 lotteries (saves models/best_swarm.pt)
+C:\Python314\python.exe main_swarm.py joint-train
+C:\Python314\python.exe main_swarm.py joint-train --epochs 200 --lr 3e-4
+
+# Generate plays for any lottery
+C:\Python314\python.exe main_swarm.py predict --lottery lottomax --plays 5
+C:\Python314\python.exe main_swarm.py predict --lottery 649 --plays 5
+C:\Python314\python.exe main_swarm.py predict --lottery dailygrand --plays 5
+
+# Log a new draw result (6/49 or Daily Grand only — LottoMax still uses main.py log)
+C:\Python314\python.exe main_swarm.py log --lottery 649 --date 2026-03-26 --numbers 3 7 18 24 31 42 --bonus 15
+C:\Python314\python.exe main_swarm.py log --lottery dailygrand --date 2026-03-27 --numbers 8 17 28 37 46 --bonus 4
+
+# Show swarm state (training count, val loss, last hit scores, agent weights)
+C:\Python314\python.exe main_swarm.py status
+```
+
+**Normal routine after each draw:**
+- LottoMax: `main.py log` → `main_swarm.py joint-train` → `main_swarm.py predict --lottery lottomax`
+- 6/49 or Daily Grand: `main_swarm.py log` → `main_swarm.py joint-train` → `main_swarm.py predict --lottery 649|dailygrand`
+
+**Swarm architecture** (`src/model_swarm.py`, `src/preprocessing_swarm.py`):
+- `SharedLotteryTransformer` — one Pre-LN transformer backbone + 3 per-lottery head pairs (~253K params)
+- All inputs padded to `POOL_MAX=50` (2×50=100 features per timestep); output heads use natural sizes: LottoMax main=50 bonus=50, 6/49 main=49 bonus=49, Daily Grand main=49 bonus=7
+- `lottery_id` embedding (0=LottoMax, 1=6/49, 2=DailyGrand) broadcast-added to every timestep
+- Round-robin joint training: batches alternate across lotteries each epoch
+- Single checkpoint: `models/best_swarm.pt`
+- Swarm state: `data/swarm_state.json` — auto-updated after every `joint-train` and `log`
+
+**Per-lottery configs** (single source of truth in `src/preprocessing_swarm.py::LOTTERY_CONFIGS`):
+- Daily Grand uses column `grand` in CSV (not `bonus`) — `load_lottery_df()` renames it internally
+- Draw data: `data/draws.csv` (LottoMax), `data/draws_649.csv`, `data/draws_dailygrand.csv`
+
+**Planned phases:**
+- Phase 2: Actor-Critic play generation, Reflexion logging (`feedback.py`), Thompson sampling bandit for agent weights
+- Phase 3: DeepAR agent, probabilistic LSTM head, N-BEATS, Pyro probabilistic model
+
 ## Applied Learning
 
 Lessons from real usage — updated whenever something breaks, causes confusion, or a fix proves itself.
@@ -142,3 +185,7 @@ Lessons from real usage — updated whenever something breaks, causes confusion,
 - **`NUM_SUGGESTIONS` renamed to `NUM_PLAYS`**: When the user edited `config.py` directly, they reverted to `NUM_SUGGESTIONS`. The rest of the code references `config.NUM_PLAYS` — always check config keys match after manual edits.
 - **OLG lottery page requires JavaScript** — plain `WebFetch` returns no numbers. The backend API (`gateway.www.olg.ca`, `gateway.can2.mkodo.io`) requires auth. Solution: Playwright MCP renders the page in a real browser.
 - **`LINES_PER_PLAY` and `"name"` key can go missing from config**: User's manual edit dropped both. Code in `predict.py` and `evaluate.py` depends on them — restore if missing.
+- **GTX 1660 Super arriving ~2026-03-27**: 6GB GDDR6, CUDA 7.5, will be installed headless (3rd PCIe slot, no monitor). After install, verify with `torch.cuda.is_available()`. Device is auto-detected in all train loops.
+- **draws_649.csv data loss incident**: A cleaning script with a date regex wiped all rows (wrote header only). No git backup existed. Fix: always assert `len(df) == expected_rows` before writing any cleaned CSV.
+- **Swarm PyTorch UserWarning on nested tensors**: `enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True`. Non-fatal — expected when using Pre-LN (`norm_first=True`). Ignore it.
+- **Daily Grand bonus column is named `grand` in CSV**, not `bonus`. `load_lottery_df()` renames it internally. Do not change the CSV header.
