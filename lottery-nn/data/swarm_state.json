@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "last_updated": "2026-03-25",
+  "joint_train_count": 1,
+  "joint_val_loss": 1.505867,
+  "agent_weights": {
+    "lottomax": {
+      "swarm": 1.0
+    },
+    "649": {
+      "swarm": 1.0
+    },
+    "dailygrand": {
+      "swarm": 1.0
+    }
+  },
+  "last_scores": {
+    "lottomax": {
+      "hits": 3,
+      "date": "2026-03-25"
+    },
+    "649": {
+      "hits": null,
+      "date": null
+    },
+    "dailygrand": {
+      "hits": null,
+      "date": null
+    }
+  }
+}

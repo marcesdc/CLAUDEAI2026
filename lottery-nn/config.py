@@ -7,10 +7,11 @@ Adjust LOTTERY settings to match your target game.
 # Lottery definition
 # ---------------------------------------------------------------------------
 LOTTERY = {
-	"name": "Lottery",
-	"main_count": 7,       # how many numbers to pick
-	"main_max": 50,        # highest main number
-	"bonus_max": 50,       # bonus ball range (1 to bonus_max)
+	"name":        "Lotto Max",
+	"id":          0,      # swarm lottery index (0=LottoMax, 1=649, 2=DailyGrand)
+	"main_count":  7,      # how many numbers to pick
+	"main_max":    50,     # highest main number
+	"bonus_max":   50,     # bonus ball range (1 to bonus_max)
 }
 
 # A single "play" (ticket) contains this many lines of 7 numbers.
