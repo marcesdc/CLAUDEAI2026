@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(C:/Python314/python.exe *)",
+      "Bash(pip *)",
+      "Bash(git *)",
+      "Bash(npx *)"
+    ]
+  }
+}

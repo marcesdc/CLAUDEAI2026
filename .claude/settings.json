@@ -1,0 +1,23 @@
+{
+  "defaultModel": "claude-sonnet-4-6",
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(C:/Python314/python.exe *)",
+      "Bash(pip install *)",
+      "Bash(pip *)",
+      "Bash(git *)",
+      "Bash(npx skills *)",
+      "WebFetch(domain:skills.sh)",
+      "WebFetch(domain:www.olg.ca)",
+      "WebFetch(domain:code.claude.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:github.com)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(del /f *)",
+      "Edit(.env)"
+    ]
+  }
+}
