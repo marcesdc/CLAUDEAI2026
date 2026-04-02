@@ -17,6 +17,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 import config
 from src.model import build_model, count_params
+from src.focal_loss import focal_loss_with_logits
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -58,7 +59,6 @@ def train(
         model.parameters(), lr=config.LR, weight_decay=config.WEIGHT_DECAY
     )
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
-    main_criterion = nn.BCEWithLogitsLoss()
     bonus_criterion = nn.CrossEntropyLoss() if has_bonus else None
 
     best_val_loss = float("inf")
@@ -69,8 +69,8 @@ def train(
 
     for epoch in range(1, epochs + 1):
         t0 = time.time()
-        tr_loss = _run_epoch(model, train_loader, optimizer, main_criterion, bonus_criterion, train=True)
-        val_loss = _run_epoch(model, val_loader, None, main_criterion, bonus_criterion, train=False)
+        tr_loss = _run_epoch(model, train_loader, optimizer, bonus_criterion, train=True)
+        val_loss = _run_epoch(model, val_loader, None, bonus_criterion, train=False)
         scheduler.step()
 
         history["train_loss"].append(tr_loss)
@@ -115,7 +115,7 @@ def _make_loader(X, y_main, y_bonus, shuffle: bool, weights: np.ndarray = None) 
     return DataLoader(ds, batch_size=config.BATCH_SIZE, shuffle=shuffle, pin_memory=True)
 
 
-def _run_epoch(model, loader, optimizer, main_crit, bonus_crit, train: bool) -> float:
+def _run_epoch(model, loader, optimizer, bonus_crit, train: bool) -> float:
     model.train(train)
     total_loss = 0.0
     ctx = torch.enable_grad() if train else torch.no_grad()
@@ -127,7 +127,11 @@ def _run_epoch(model, loader, optimizer, main_crit, bonus_crit, train: bool) -> 
             y_bonus = batch[2].to(DEVICE) if len(batch) == 3 else None
 
             main_logits, bonus_logits = model(x)
-            loss = main_crit(main_logits, y_main)
+            loss = focal_loss_with_logits(
+                main_logits, y_main,
+                gamma=config.FOCAL_GAMMA,
+                alpha=config.FOCAL_ALPHA,
+            )
 
             if bonus_crit is not None and bonus_logits is not None and y_bonus is not None:
                 bonus_target = y_bonus.argmax(dim=1)
