@@ -211,7 +211,12 @@ Examples:
 The lead agent launches `q_a1` and `q_a2` in parallel and returns a final GREEN/RED verdict.
 
 ### When to invoke
-- After every code change to any `src/` module
+
+**MANDATORY** — the QA team MUST run after every session that creates or modifies code.
+No exceptions. Do not consider implementation complete until the QA lead returns GREEN.
+
+- After every code change to any `src/` module or root-level script
+- After creating any new file in `src/` or `tests/`
 - After every new training strategy (RLOO, MaxEnt, data augmentation, actor-critic, etc.)
 - Before backtesting a new strategy against historical data
 - After manually editing `config.py`
