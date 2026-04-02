@@ -1,0 +1,1268 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=e6]:
+      - heading "Navigation Menu" [level=2] [ref=e7]
+      - generic [ref=e8]:
+        - link "Homepage" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=e11]
+        - generic [ref=e13]:
+          - navigation "Global" [ref=e16]:
+            - list [ref=e17]:
+              - listitem [ref=e18]:
+                - button "Platform" [ref=e20] [cursor=pointer]:
+                  - text: Platform
+                  - img [ref=e21]
+              - listitem [ref=e23]:
+                - button "Solutions" [ref=e25] [cursor=pointer]:
+                  - text: Solutions
+                  - img [ref=e26]
+              - listitem [ref=e28]:
+                - button "Resources" [ref=e30] [cursor=pointer]:
+                  - text: Resources
+                  - img [ref=e31]
+              - listitem [ref=e33]:
+                - button "Open Source" [ref=e35] [cursor=pointer]:
+                  - text: Open Source
+                  - img [ref=e36]
+              - listitem [ref=e38]:
+                - button "Enterprise" [ref=e40] [cursor=pointer]:
+                  - text: Enterprise
+                  - img [ref=e41]
+              - listitem [ref=e43]:
+                - link "Pricing" [ref=e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+                  - generic [ref=e45]: Pricing
+          - generic [ref=e46]:
+            - button "Search or jump to…" [ref=e49] [cursor=pointer]:
+              - img [ref=e51]
+            - link "Sign in" [ref=e54] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fruvnet%2Fyyz-agentics-june
+            - link "Sign up" [ref=e55] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E&source=header-repo&source_repo=ruvnet%2Fyyz-agentics-june
+            - button "Appearance settings" [ref=e58] [cursor=pointer]:
+              - img
+  - main [ref=e62]:
+    - generic [ref=e63]:
+      - generic [ref=e64]:
+        - generic [ref=e66]:
+          - img [ref=e67]
+          - link "ruvnet" [ref=e70] [cursor=pointer]:
+            - /url: /ruvnet
+          - generic [ref=e71]: /
+          - strong [ref=e72]:
+            - link "yyz-agentics-june" [ref=e73] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june
+          - generic [ref=e74]: Public
+        - generic [ref=e75]:
+          - list:
+            - listitem [ref=e76]:
+              - link "You must be signed in to change notification settings" [ref=e77] [cursor=pointer]:
+                - /url: /login?return_to=%2Fruvnet%2Fyyz-agentics-june
+                - img [ref=e78]
+                - text: Notifications
+            - listitem [ref=e80]:
+              - link "Fork 12" [ref=e81] [cursor=pointer]:
+                - /url: /login?return_to=%2Fruvnet%2Fyyz-agentics-june
+                - img [ref=e82]
+                - text: Fork
+                - generic "12" [ref=e84]
+            - listitem [ref=e85]:
+              - link "You must be signed in to star a repository" [ref=e87] [cursor=pointer]:
+                - /url: /login?return_to=%2Fruvnet%2Fyyz-agentics-june
+                - img [ref=e88]
+                - text: Star
+                - generic "31 users starred this repository" [ref=e90]: "31"
+      - navigation "Repository" [ref=e91]:
+        - list [ref=e92]:
+          - listitem [ref=e93]:
+            - link "Code" [ref=e94] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june
+              - img [ref=e95]
+              - generic [ref=e97]: Code
+          - listitem [ref=e98]:
+            - link "Issues 2" [ref=e99] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/issues
+              - img [ref=e100]
+              - generic [ref=e103]: Issues
+              - generic "2" [ref=e104]
+          - listitem [ref=e105]:
+            - link "Pull requests" [ref=e106] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/pulls
+              - img [ref=e107]
+              - generic [ref=e109]: Pull requests
+          - listitem [ref=e110]:
+            - link "Actions" [ref=e111] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/actions
+              - img [ref=e112]
+              - generic [ref=e114]: Actions
+          - listitem [ref=e115]:
+            - link "Projects" [ref=e116] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/projects
+              - img [ref=e117]
+              - generic [ref=e119]: Projects
+          - listitem [ref=e120]:
+            - link "Security and quality" [ref=e121] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/security
+              - img [ref=e122]
+              - generic [ref=e124]: Security and quality
+          - listitem [ref=e125]:
+            - link "Insights" [ref=e126] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/pulse
+              - img [ref=e127]
+              - generic [ref=e129]: Insights
+    - generic [ref=e142]:
+      - heading "ruvnet/yyz-agentics-june" [level=1] [ref=e144]
+      - generic [ref=e145]:
+        - generic [ref=e148]:
+          - generic [ref=e149]:
+            - generic [ref=e150]:
+              - button "main branch" [ref=e152] [cursor=pointer]:
+                - generic [ref=e153]:
+                  - generic [ref=e155]:
+                    - img [ref=e157]
+                    - generic [ref=e160]: main
+                  - generic:
+                    - img
+              - generic [ref=e161]:
+                - link "Go to Branches page" [ref=e162] [cursor=pointer]:
+                  - /url: /ruvnet/yyz-agentics-june/branches
+                  - img [ref=e163]
+                - link "Go to Tags page" [ref=e165] [cursor=pointer]:
+                  - /url: /ruvnet/yyz-agentics-june/tags
+                  - img [ref=e166]
+            - generic [ref=e168]:
+              - generic [ref=e172]:
+                - img [ref=e174]
+                - combobox "Go to file" [ref=e176]
+              - button "Code" [ref=e177] [cursor=pointer]:
+                - generic [ref=e178]:
+                  - generic:
+                    - img
+                  - generic [ref=e179]: Code
+                  - generic:
+                    - img
+          - generic [ref=e180]:
+            - generic [ref=e181]:
+              - heading "Folders and files" [level=2] [ref=e182]
+              - table "Folders and files" [ref=e183]:
+                - rowgroup:
+                  - row "Name Last commit message Last commit date":
+                    - columnheader "Name"
+                    - columnheader "Last commit message":
+                      - generic "Last commit message"
+                    - columnheader "Last commit date":
+                      - generic "Last commit date"
+                - rowgroup [ref=e184]:
+                  - row "Latest commit ruvnet commits by ruvnet init Commit 1f1ec86 · Jun 25, 202510 months ago History 2 Commits" [ref=e185]:
+                    - cell "Latest commit ruvnet commits by ruvnet init Commit 1f1ec86 · Jun 25, 202510 months ago History 2 Commits" [ref=e186]:
+                      - generic [ref=e187]:
+                        - heading "Latest commit" [level=2] [ref=e188]
+                        - generic [ref=e189]:
+                          - generic [ref=e191]:
+                            - link "ruvnet" [ref=e192] [cursor=pointer]:
+                              - /url: /ruvnet
+                              - img "ruvnet" [ref=e193]
+                            - link "commits by ruvnet" [ref=e194] [cursor=pointer]:
+                              - /url: /ruvnet/yyz-agentics-june/commits?author=ruvnet
+                              - text: ruvnet
+                          - link "init" [ref=e198] [cursor=pointer]:
+                            - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                        - generic [ref=e199]:
+                          - generic [ref=e201]:
+                            - link "Commit 1f1ec86" [ref=e202] [cursor=pointer]:
+                              - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                              - text: 1f1ec86
+                            - text: ·
+                            - generic "Jun 25, 2025, 12:46 PM EDT" [ref=e203]: Jun 25, 202510 months ago
+                          - generic [ref=e204]:
+                            - heading "History" [level=2] [ref=e205]
+                            - link "2 Commits" [ref=e206] [cursor=pointer]:
+                              - /url: /ruvnet/yyz-agentics-june/commits/main/
+                              - generic [ref=e207]:
+                                - generic:
+                                  - img
+                                - generic [ref=e208]: 2 Commits
+                  - row ".claude, (Directory) init Jun 25, 202510 months ago" [ref=e209]:
+                    - cell ".claude, (Directory)" [ref=e210]:
+                      - generic [ref=e211]:
+                        - img [ref=e212]
+                        - link ".claude, (Directory)" [ref=e217] [cursor=pointer]:
+                          - /url: /ruvnet/yyz-agentics-june/tree/main/.claude
+                          - text: .claude
+                    - cell "init" [ref=e218]:
+                      - link "init" [ref=e221] [cursor=pointer]:
+                        - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                    - cell "Jun 25, 202510 months ago" [ref=e222]:
+                      - generic [ref=e223]: Jun 25, 202510 months ago
+                  - row "neural_network, (Directory) init Jun 25, 202510 months ago" [ref=e224]:
+                    - cell "neural_network, (Directory)" [ref=e225]:
+                      - generic [ref=e226]:
+                        - img [ref=e227]
+                        - link "neural_network, (Directory)" [ref=e232] [cursor=pointer]:
+                          - /url: /ruvnet/yyz-agentics-june/tree/main/neural_network
+                          - text: neural_network
+                    - cell "init" [ref=e233]:
+                      - link "init" [ref=e236] [cursor=pointer]:
+                        - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                    - cell "Jun 25, 202510 months ago" [ref=e237]:
+                      - generic [ref=e238]: Jun 25, 202510 months ago
+                  - row "neuralflow, (Directory) init Jun 25, 202510 months ago" [ref=e239]:
+                    - cell "neuralflow, (Directory)" [ref=e240]:
+                      - generic [ref=e241]:
+                        - img [ref=e242]
+                        - link "neuralflow, (Directory)" [ref=e247] [cursor=pointer]:
+                          - /url: /ruvnet/yyz-agentics-june/tree/main/neuralflow
+                          - text: neuralflow
+                    - cell "init" [ref=e248]:
+                      - link "init" [ref=e251] [cursor=pointer]:
+                        - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                    - cell "Jun 25, 202510 months ago" [ref=e252]:
+                      - generic [ref=e253]: Jun 25, 202510 months ago
+                  - row "performance_optimization, (Directory) init Jun 25, 202510 months ago" [ref=e254]:
+                    - cell "performance_optimization, (Directory)" [ref=e255]:
+                      - generic [ref=e256]:
+                        - img [ref=e257]
+                        - link "performance_optimization, (Directory)" [ref=e262] [cursor=pointer]:
+                          - /url: /ruvnet/yyz-agentics-june/tree/main/performance_optimization
+                          - text: performance_optimization
+                    - cell "init" [ref=e263]:
+                      - link "init" [ref=e266] [cursor=pointer]:
+                        - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                    - cell "Jun 25, 202510 months ago" [ref=e267]:
+                      - generic [ref=e268]: Jun 25, 202510 months ago
+                  - row "tests, (Directory) init Jun 25, 202510 months ago" [ref=e269]:
+                    - cell "tests, (Directory)" [ref=e270]:
+                      - generic [ref=e271]:
+                        - img [ref=e272]
+                        - link "tests, (Directory)" [ref=e277] [cursor=pointer]:
+                          - /url: /ruvnet/yyz-agentics-june/tree/main/tests
+                          - text: tests
+                    - cell "init" [ref=e278]:
+                      - link "init" [ref=e281] [cursor=pointer]:
+                        - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                    - cell "Jun 25, 202510 months ago" [ref=e282]:
+                      - generic [ref=e283]: Jun 25, 202510 months ago
+                  - row ".roomodes, (File) init Jun 25, 202510 months ago" [ref=e284]:
+                    - cell ".roomodes, (File)" [ref=e285]:
+                      - generic [ref=e286]:
+                        - img [ref=e287]
+                        - link ".roomodes, (File)" [ref=e292] [cursor=pointer]:
+                          - /url: /ruvnet/yyz-agentics-june/blob/main/.roomodes
+                          - text: .roomodes
+                    - cell "init" [ref=e293]:
+                      - link "init" [ref=e296] [cursor=pointer]:
+                        - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                    - cell "Jun 25, 202510 months ago" [ref=e297]:
+                      - generic [ref=e298]: Jun 25, 202510 months ago
+                  - row "CLAUDE.md, (File) init Jun 25, 202510 months ago" [ref=e299]:
+                    - cell "CLAUDE.md, (File)" [ref=e300]:
+                      - generic [ref=e301]:
+                        - img [ref=e302]
+                        - link "CLAUDE.md, (File)" [ref=e307] [cursor=pointer]:
+                          - /url: /ruvnet/yyz-agentics-june/blob/main/CLAUDE.md
+                          - text: CLAUDE.md
+                    - cell "init" [ref=e308]:
+                      - link "init" [ref=e311] [cursor=pointer]:
+                        - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                    - cell "Jun 25, 202510 months ago" [ref=e312]:
+                      - generic [ref=e313]: Jun 25, 202510 months ago
+                  - row "LICENSE, (File) init Jun 25, 202510 months ago" [ref=e314]:
+                    - cell "LICENSE, (File)" [ref=e315]:
+                      - generic [ref=e316]:
+                        - img [ref=e317]
+                        - link "LICENSE, (File)" [ref=e322] [cursor=pointer]:
+                          - /url: /ruvnet/yyz-agentics-june/blob/main/LICENSE
+                          - text: LICENSE
+                    - cell "init" [ref=e323]:
+                      - link "init" [ref=e326] [cursor=pointer]:
+                        - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                    - cell "Jun 25, 202510 months ago" [ref=e327]:
+                      - generic [ref=e328]: Jun 25, 202510 months ago
+                  - row "README.md, (File) init Jun 25, 202510 months ago" [ref=e329]:
+                    - cell "README.md, (File)" [ref=e330]:
+                      - generic [ref=e331]:
+                        - img [ref=e332]
+                        - link "README.md, (File)" [ref=e337] [cursor=pointer]:
+                          - /url: /ruvnet/yyz-agentics-june/blob/main/README.md
+                          - text: README.md
+                    - cell "init" [ref=e338]:
+                      - link "init" [ref=e341] [cursor=pointer]:
+                        - /url: /ruvnet/yyz-agentics-june/commit/1f1ec86361dd6b4782a642a24afd77de857ba4f7
+                    - cell "Jun 25, 202510 months ago" [ref=e342]:
+                      - generic [ref=e343]: Jun 25, 202510 months ago
+            - generic [ref=e345]:
+              - generic [ref=e346]:
+                - heading "Repository files navigation" [level=2] [ref=e347]
+                - navigation "Repository files" [ref=e348]:
+                  - list [ref=e349]:
+                    - listitem [ref=e350]:
+                      - link "README" [ref=e351] [cursor=pointer]:
+                        - /url: "#"
+                        - img [ref=e353]
+                        - generic [ref=e355]: README
+                    - listitem [ref=e356]:
+                      - link "MIT license" [ref=e357] [cursor=pointer]:
+                        - /url: "#"
+                        - img [ref=e359]
+                        - generic [ref=e361]: MIT license
+                - button "Outline" [ref=e362] [cursor=pointer]:
+                  - img [ref=e363]
+              - article [ref=e366]:
+                - generic [ref=e367]:
+                  - heading "AI-Powered Neural Network Libraries" [level=1] [ref=e368]
+                  - 'link "Permalink: AI-Powered Neural Network Libraries" [ref=e369] [cursor=pointer]':
+                    - /url: "#ai-powered-neural-network-libraries"
+                    - img [ref=e370]
+                - generic [ref=e372]:
+                  - 'heading "From Live Demo to Production: Claude-Flow Swarm Orchestration" [level=2] [ref=e373]'
+                  - 'link "Permalink: From Live Demo to Production: Claude-Flow Swarm Orchestration" [ref=e374] [cursor=pointer]':
+                    - /url: "#from-live-demo-to-production-claude-flow-swarm-orchestration"
+                    - img [ref=e375]
+                - paragraph [ref=e377]:
+                  - link "Code Lines" [ref=e378] [cursor=pointer]:
+                    - /url: "#code-metrics"
+                    - img "Code Lines" [ref=e379]
+                  - link "Estimated Value" [ref=e380] [cursor=pointer]:
+                    - /url: "#development-value"
+                    - img "Estimated Value" [ref=e381]
+                  - link "Libraries" [ref=e382] [cursor=pointer]:
+                    - /url: "#libraries"
+                    - img "Libraries" [ref=e383]
+                  - link "Demo Status" [ref=e384] [cursor=pointer]:
+                    - /url: "#demonstrations"
+                    - img "Demo Status" [ref=e385]
+                - generic [ref=e386]:
+                  - heading "🎯 From Live Coding to AI Swarm Development" [level=2] [ref=e387]
+                  - 'link "Permalink: 🎯 From Live Coding to AI Swarm Development" [ref=e388] [cursor=pointer]':
+                    - /url: "#-from-live-coding-to-ai-swarm-development"
+                    - img [ref=e389]
+                - paragraph [ref=e391]:
+                  - text: Last night's
+                  - strong [ref=e392]: Agentics Foundation meetup in Toronto
+                  - text: was incredible. Packed house, sharp minds, and nonstop energy from start to finish.
+                - paragraph [ref=e393]:
+                  - text: I always love live coding during these sessions—and last night didn't disappoint. In the
+                  - strong [ref=e394]: 20 minutes
+                  - text: I had, I built a working neural network from scratch, live in front of everyone. No frameworks. No prep. Just raw logic, math, and code. The whole point was to show how simple and powerful these systems can be when stripped down to the essentials.
+                - paragraph [ref=e395]:
+                  - text: "But here's where it gets interesting:"
+                  - strong [ref=e396]: What if we could take that live coding energy and scale it with AI?
+                - generic [ref=e397]:
+                  - heading "🚀 The Claude-Flow Challenge" [level=2] [ref=e398]
+                  - 'link "Permalink: 🚀 The Claude-Flow Challenge" [ref=e399] [cursor=pointer]':
+                    - /url: "#-the-claude-flow-challenge"
+                    - img [ref=e400]
+                - paragraph [ref=e402]:
+                  - text: "After the live demo, I posed a question:"
+                  - emphasis [ref=e403]: "\"What would happen if we unleashed Claude Code's swarm orchestration on this problem?\""
+                  - text: Instead of 20 minutes of manual coding, could a coordinated team of AI agents deliver enterprise-grade neural network libraries?
+                - paragraph [ref=e404]:
+                  - strong [ref=e405]: The answer exceeded all expectations.
+                - paragraph [ref=e406]:
+                  - text: This repository contains
+                  - strong [ref=e407]: two comprehensive neural network libraries
+                  - text: built entirely through Claude Code's advanced swarm orchestration system. In a single session, a coordinated team of
+                  - strong [ref=e408]: 10 specialized AI agents
+                  - text: researched, designed, implemented, and delivered production-ready neural network frameworks optimized for CPU execution.
+                - generic [ref=e409]:
+                  - heading "🎪 The Live Demo vs. The AI Swarm" [level=3] [ref=e410]
+                  - 'link "Permalink: 🎪 The Live Demo vs. The AI Swarm" [ref=e411] [cursor=pointer]':
+                    - /url: "#-the-live-demo-vs-the-ai-swarm"
+                    - img [ref=e412]
+                - table [ref=e415]:
+                  - rowgroup [ref=e416]:
+                    - row "Live Demo (20 minutes) Claude-Flow Swarm (Single Session)" [ref=e417]:
+                      - columnheader "Live Demo (20 minutes)" [ref=e418]:
+                        - strong [ref=e419]: Live Demo (20 minutes)
+                      - columnheader "Claude-Flow Swarm (Single Session)" [ref=e420]:
+                        - strong [ref=e421]: Claude-Flow Swarm (Single Session)
+                  - rowgroup [ref=e422]:
+                    - row "✅ Basic neural network ✅ Two complete libraries" [ref=e423]:
+                      - cell "✅ Basic neural network" [ref=e424]
+                      - cell "✅ Two complete libraries" [ref=e425]
+                    - row "✅ Forward/backward pass ✅ 15+ layer types, 4 optimizers" [ref=e426]:
+                      - cell "✅ Forward/backward pass" [ref=e427]
+                      - cell "✅ 15+ layer types, 4 optimizers" [ref=e428]
+                    - row "✅ Simple gradient descent ✅ Advanced optimizations (50x speedup)" [ref=e429]:
+                      - cell "✅ Simple gradient descent" [ref=e430]
+                      - cell "✅ Advanced optimizations (50x speedup)" [ref=e431]
+                    - row "✅ Educational example ✅ Production-ready with 104 tests" [ref=e432]:
+                      - cell "✅ Educational example" [ref=e433]
+                      - cell "✅ Production-ready with 104 tests" [ref=e434]
+                    - row "✅ ~100 lines of code ✅ 35,064 lines, $882K+ value" [ref=e435]:
+                      - cell "✅ ~100 lines of code" [ref=e436]
+                      - cell "✅ 35,064 lines, $882K+ value" [ref=e437]
+                - paragraph [ref=e438]:
+                  - strong [ref=e439]: The live demo showed the fundamentals.
+                  - text: This project shows what happens when you combine human insight with AI-powered swarm development.
+                - paragraph [ref=e440]:
+                  - text: If you were there and want to explore what we built—or if you're just curious about the future of AI-assisted development—everything is here. The process, the decisions, the recoveries, and most importantly,
+                  - strong [ref=e441]: the breakthrough results
+                  - text: that demonstrate how swarm intelligence can amplify human creativity.
+                - generic [ref=e442]:
+                  - heading "🚀 What Was Built" [level=2] [ref=e443]
+                  - 'link "Permalink: 🚀 What Was Built" [ref=e444] [cursor=pointer]':
+                    - /url: "#-what-was-built"
+                    - img [ref=e445]
+                - generic [ref=e447]:
+                  - heading "NeuralFlow - Modern Deep Learning Library" [level=3] [ref=e448]:
+                    - strong [ref=e449]: NeuralFlow
+                    - text: "- Modern Deep Learning Library"
+                  - 'link "Permalink: NeuralFlow - Modern Deep Learning Library" [ref=e450] [cursor=pointer]':
+                    - /url: "#neuralflow---modern-deep-learning-library"
+                    - img [ref=e451]
+                - paragraph [ref=e453]:
+                  - strong [ref=e454]: Location
+                  - text: ":"
+                  - code [ref=e455]: /neuralflow/
+                - paragraph [ref=e456]: A modern, Keras-inspired neural network library with automatic differentiation and comprehensive training infrastructure.
+                - paragraph [ref=e457]:
+                  - strong [ref=e458]: "Key Features:"
+                - list [ref=e459]:
+                  - listitem [ref=e460]:
+                    - text: 🧠
+                    - strong [ref=e461]: Custom Tensor System
+                    - text: with automatic gradient computation
+                  - listitem [ref=e462]:
+                    - text: 🔗
+                    - strong [ref=e463]: Sequential Model API
+                    - text: for easy model construction
+                  - listitem [ref=e464]:
+                    - text: 🎯
+                    - strong [ref=e465]: 15+ Layer Types
+                    - text: ": Dense, Conv2D, LSTM, GRU, Attention, Dropout, BatchNorm"
+                  - listitem [ref=e466]:
+                    - text: ⚡
+                    - strong [ref=e467]: 4 Optimizers
+                    - text: ": SGD, Adam, RMSprop, AdaGrad with learning rate scheduling"
+                  - listitem [ref=e468]:
+                    - text: 📊
+                    - strong [ref=e469]: 4 Loss Functions
+                    - text: ": MSE, MAE, Binary/Categorical Crossentropy"
+                  - listitem [ref=e470]:
+                    - text: 🎨
+                    - strong [ref=e471]: 6 Activation Functions
+                    - text: ": ReLU, Sigmoid, Tanh, Softmax, LeakyReLU, Linear"
+                  - listitem [ref=e472]:
+                    - text: 📦
+                    - strong [ref=e473]: Complete Package
+                    - text: ": Setup.py, requirements, documentation, examples"
+                - generic [ref=e474]:
+                  - heading "Neural_Network - Educational Implementation" [level=3] [ref=e475]:
+                    - strong [ref=e476]: Neural_Network
+                    - text: "- Educational Implementation"
+                  - 'link "Permalink: Neural_Network - Educational Implementation" [ref=e477] [cursor=pointer]':
+                    - /url: "#neural_network---educational-implementation"
+                    - img [ref=e478]
+                - paragraph [ref=e480]:
+                  - strong [ref=e481]: Location
+                  - text: ":"
+                  - code [ref=e482]: /neural_network/
+                - paragraph [ref=e483]: A pure NumPy educational implementation showing neural network fundamentals with manual gradient computation.
+                - paragraph [ref=e484]:
+                  - strong [ref=e485]: "Key Features:"
+                - list [ref=e486]:
+                  - listitem [ref=e487]:
+                    - text: 📚
+                    - strong [ref=e488]: Educational Focus
+                    - text: ": Clear, readable implementations of core concepts"
+                  - listitem [ref=e489]:
+                    - text: 🔢
+                    - strong [ref=e490]: Pure NumPy
+                    - text: ": No external dependencies, CPU-optimized"
+                  - listitem [ref=e491]:
+                    - text: 🧮
+                    - strong [ref=e492]: Manual Gradients
+                    - text: ": Explicit forward and backward propagation"
+                  - listitem [ref=e493]:
+                    - text: 🏗️
+                    - strong [ref=e494]: 8 Layer Types
+                    - text: ": Dense, Conv2D, MaxPool, BatchNorm, Dropout variants"
+                  - listitem [ref=e495]:
+                    - text: 🎲
+                    - strong [ref=e496]: 8 Initializers
+                    - text: ": Xavier, He, Random Normal/Uniform, Zeros, Ones"
+                  - listitem [ref=e497]:
+                    - text: 📈
+                    - strong [ref=e498]: 8 Activations
+                    - text: ": ReLU, Sigmoid, Tanh, ELU, Swish, GELU, Softmax"
+                - generic [ref=e499]:
+                  - heading "🤖 Claude-Flow & Claude Code Integration" [level=2] [ref=e500]
+                  - 'link "Permalink: 🤖 Claude-Flow & Claude Code Integration" [ref=e501] [cursor=pointer]':
+                    - /url: "#-claude-flow--claude-code-integration"
+                    - img [ref=e502]
+                - paragraph [ref=e504]:
+                  - text: This project was built using
+                  - strong [ref=e505]: Claude-Flow
+                  - text: ", the orchestration layer for Claude Code that enables swarm-based AI development. Here's how you can replicate this workflow:"
+                - generic [ref=e506]:
+                  - heading "🔧 Installation & Setup" [level=3] [ref=e507]:
+                    - strong [ref=e508]: 🔧 Installation & Setup
+                  - 'link "Permalink: 🔧 Installation & Setup" [ref=e509] [cursor=pointer]':
+                    - /url: "#-installation--setup"
+                    - img [ref=e510]
+                - generic [ref=e512]:
+                  - generic [ref=e513]:
+                    - generic [ref=e514]: "# Step 1: Install Claude Code"
+                    - text: npm install -g @anthropic-ai/claude-code
+                    - generic [ref=e515]: "# Step 2: Initialize Claude-Flow with SPARC methodology"
+                    - text: npx -y claude-flow@latest init --sparc --force
+                    - generic [ref=e516]: "# Step 3: Start Claude Code with permissions"
+                    - text: claude --dangerously-skip-permissions
+                    - generic [ref=e517]: "# Accept the UI warning message when prompted"
+                    - generic [ref=e518]: "# Step 4: Execute Swarm Orchestration"
+                    - text: ./claude-flow swarm
+                    - generic [ref=e519]: "\"research and build a complex neural network using cpu in python\""
+                  - button "Copy" [ref=e521] [cursor=pointer]:
+                    - img [ref=e522]
+                - generic [ref=e525]:
+                  - heading "🎯 How This Project Was Built" [level=3] [ref=e526]:
+                    - strong [ref=e527]: 🎯 How This Project Was Built
+                  - 'link "Permalink: 🎯 How This Project Was Built" [ref=e528] [cursor=pointer]':
+                    - /url: "#-how-this-project-was-built"
+                    - img [ref=e529]
+                - paragraph [ref=e531]: "The entire neural network library development was orchestrated through a single command:"
+                - generic [ref=e532]:
+                  - generic [ref=e533]:
+                    - text: ./claude-flow swarm
+                    - generic [ref=e534]: "\"research and build a complex neural network using cpu in python\""
+                  - button "Copy" [ref=e536] [cursor=pointer]:
+                    - img [ref=e537]
+                - paragraph [ref=e540]: "This automatically:"
+                - list [ref=e541]:
+                  - listitem [ref=e542]:
+                    - text: ✅
+                    - strong [ref=e543]: Spawned 10 specialized AI agents
+                    - text: with different expertise areas
+                  - listitem [ref=e544]:
+                    - text: ✅
+                    - strong [ref=e545]: Coordinated parallel development
+                    - text: across all components
+                  - listitem [ref=e546]:
+                    - text: ✅
+                    - strong [ref=e547]: Managed dependencies
+                    - text: between different tasks and agents
+                  - listitem [ref=e548]:
+                    - text: ✅
+                    - strong [ref=e549]: Ensured quality
+                    - text: through automated testing and validation
+                  - listitem [ref=e550]:
+                    - text: ✅
+                    - strong [ref=e551]: Delivered production-ready
+                    - text: libraries with documentation
+                - generic [ref=e552]:
+                  - heading "🚀 Claude Code Swarm Orchestration Capabilities" [level=2] [ref=e553]
+                  - 'link "Permalink: 🚀 Claude Code Swarm Orchestration Capabilities" [ref=e554] [cursor=pointer]':
+                    - /url: "#-claude-code-swarm-orchestration-capabilities"
+                    - img [ref=e555]
+                - paragraph [ref=e557]:
+                  - text: This project demonstrates the power of
+                  - strong [ref=e558]: Claude Code's swarm orchestration capabilities
+                  - text: ":"
+                - generic [ref=e559]:
+                  - heading "10 Specialized Agents Deployed:" [level=3] [ref=e560]:
+                    - strong [ref=e561]: "10 Specialized Agents Deployed:"
+                  - 'link "Permalink: 10 Specialized Agents Deployed:" [ref=e562] [cursor=pointer]':
+                    - /url: "#10-specialized-agents-deployed"
+                    - img [ref=e563]
+                - list [ref=e565]:
+                  - listitem [ref=e566]:
+                    - strong [ref=e567]: Neural Network Research Specialist
+                    - text: "- Analyzed CPU-optimized architectures"
+                  - listitem [ref=e568]:
+                    - strong [ref=e569]: Architecture Designer
+                    - text: "- Created modular, extensible system designs"
+                  - listitem [ref=e570]:
+                    - strong [ref=e571]: Core Components Developer
+                    - text: "- Implemented foundational layers and operations"
+                  - listitem [ref=e572]:
+                    - strong [ref=e573]: Advanced Layers Developer
+                    - text: "- Built RNN, attention, and transformer components"
+                  - listitem [ref=e574]:
+                    - strong [ref=e575]: Optimizer Implementation Specialist
+                    - text: "- Created SGD, Adam, RMSprop, AdaGrad"
+                  - listitem [ref=e576]:
+                    - strong [ref=e577]: Training Pipeline Engineer
+                    - text: "- Built complete training infrastructure"
+                  - listitem [ref=e578]:
+                    - strong [ref=e579]: Performance Optimization Specialist
+                    - text: "- Achieved up to 50x speedups"
+                  - listitem [ref=e580]:
+                    - strong [ref=e581]: Testing and Validation Engineer
+                    - text: "- Created 104 comprehensive tests"
+                  - listitem [ref=e582]:
+                    - strong [ref=e583]: API and Documentation Lead
+                    - text: "- Designed APIs and wrote complete documentation"
+                  - listitem [ref=e584]:
+                    - strong [ref=e585]: Integration and Demo Developer
+                    - text: "- Delivered working demonstrations"
+                - generic [ref=e586]:
+                  - heading "Swarm Coordination Features:" [level=3] [ref=e587]:
+                    - strong [ref=e588]: "Swarm Coordination Features:"
+                  - 'link "Permalink: Swarm Coordination Features:" [ref=e589] [cursor=pointer]':
+                    - /url: "#swarm-coordination-features"
+                    - img [ref=e590]
+                - list [ref=e592]:
+                  - listitem [ref=e593]:
+                    - text: 🎯
+                    - strong [ref=e594]: Autonomous Task Distribution
+                    - text: "- Each agent worked independently on specialized tasks"
+                  - listitem [ref=e595]:
+                    - text: 🧠
+                    - strong [ref=e596]: Memory-Driven Coordination
+                    - text: "- Shared knowledge through persistent memory system"
+                  - listitem [ref=e597]:
+                    - text: 🔄
+                    - strong [ref=e598]: Parallel Execution
+                    - text: "- Concurrent development across all components"
+                  - listitem [ref=e599]:
+                    - text: ✅
+                    - strong [ref=e600]: Quality Assurance
+                    - text: "- Automated testing and validation throughout"
+                  - listitem [ref=e601]:
+                    - text: 📊
+                    - strong [ref=e602]: Progress Tracking
+                    - text: "- Real-time task completion monitoring"
+                - generic [ref=e603]:
+                  - heading "💎 Key Achievements" [level=2] [ref=e604]
+                  - 'link "Permalink: 💎 Key Achievements" [ref=e605] [cursor=pointer]':
+                    - /url: "#-key-achievements"
+                    - img [ref=e606]
+                - generic [ref=e608]:
+                  - heading "Performance Optimizations" [level=3] [ref=e609]:
+                    - strong [ref=e610]: Performance Optimizations
+                  - 'link "Permalink: Performance Optimizations" [ref=e611] [cursor=pointer]':
+                    - /url: "#performance-optimizations"
+                    - img [ref=e612]
+                - list [ref=e614]:
+                  - listitem [ref=e615]:
+                    - strong [ref=e616]: Up to 50x speedup
+                    - text: in matrix operations through vectorization
+                  - listitem [ref=e617]:
+                    - strong [ref=e618]: Cache optimization
+                    - text: with 5-12x improvements via loop blocking
+                  - listitem [ref=e619]:
+                    - strong [ref=e620]: SIMD vectorization
+                    - text: leveraging NumPy's optimized operations
+                  - listitem [ref=e621]:
+                    - strong [ref=e622]: Parallel processing
+                    - text: scaling with available CPU cores
+                - generic [ref=e623]:
+                  - heading "Comprehensive Testing" [level=3] [ref=e624]:
+                    - strong [ref=e625]: Comprehensive Testing
+                  - 'link "Permalink: Comprehensive Testing" [ref=e626] [cursor=pointer]':
+                    - /url: "#comprehensive-testing"
+                    - img [ref=e627]
+                - list [ref=e629]:
+                  - listitem [ref=e630]:
+                    - strong [ref=e631]: 104 total tests
+                    - text: across unit, integration, and performance categories
+                  - listitem [ref=e632]:
+                    - strong [ref=e633]: Gradient checking
+                    - text: "with numerical validation (tolerance: 1e-7)"
+                  - listitem [ref=e634]:
+                    - strong [ref=e635]: Memory profiling
+                    - text: and leak detection
+                  - listitem [ref=e636]:
+                    - strong [ref=e637]: Benchmark regression testing
+                    - text: for performance validation
+                - generic [ref=e638]:
+                  - heading "Production-Ready Features" [level=3] [ref=e639]:
+                    - strong [ref=e640]: Production-Ready Features
+                  - 'link "Permalink: Production-Ready Features" [ref=e641] [cursor=pointer]':
+                    - /url: "#production-ready-features"
+                    - img [ref=e642]
+                - list [ref=e644]:
+                  - listitem [ref=e645]:
+                    - strong [ref=e646]: Complete packaging
+                    - text: with setup.py and requirements management
+                  - listitem [ref=e647]:
+                    - strong [ref=e648]: Extensive documentation
+                    - text: including API reference and tutorials
+                  - listitem [ref=e649]:
+                    - strong [ref=e650]: Working demonstrations
+                    - text: covering multiple use cases
+                  - listitem [ref=e651]:
+                    - strong [ref=e652]: Error handling
+                    - text: and input validation throughout
+                - generic [ref=e653]:
+                  - heading "🎮 Demonstrations" [level=2] [ref=e654]
+                  - 'link "Permalink: 🎮 Demonstrations" [ref=e655] [cursor=pointer]':
+                    - /url: "#-demonstrations"
+                    - img [ref=e656]
+                - paragraph [ref=e658]:
+                  - text: All demonstrations are
+                  - strong [ref=e659]: fully functional
+                  - text: "and thoroughly tested:"
+                - generic [ref=e660]:
+                  - heading "NeuralFlow Demos (/neuralflow/demos/)" [level=3] [ref=e661]:
+                    - strong [ref=e662]: NeuralFlow Demos
+                    - text: (
+                    - code [ref=e663]: /neuralflow/demos/
+                    - text: )
+                  - 'link "Permalink: NeuralFlow Demos (/neuralflow/demos/)" [ref=e664] [cursor=pointer]':
+                    - /url: "#neuralflow-demos-neuralflowdemos"
+                    - img [ref=e665]
+                - list [ref=e667]:
+                  - listitem [ref=e668]:
+                    - strong [ref=e669]: Image Classification
+                    - text: "- MNIST-style digit recognition with CNN architecture"
+                  - listitem [ref=e670]:
+                    - strong [ref=e671]: Text Generation
+                    - text: "- Character-level RNN for creative text synthesis"
+                  - listitem [ref=e672]:
+                    - strong [ref=e673]: Regression Analysis
+                    - text: "- Polynomial function approximation"
+                  - listitem [ref=e674]:
+                    - strong [ref=e675]: Binary Classification
+                    - text: "- Circle dataset with decision boundary visualization"
+                  - listitem [ref=e676]:
+                    - strong [ref=e677]: Multi-class Classification
+                    - text: "- Spiral dataset with confusion matrix analysis"
+                  - listitem [ref=e678]:
+                    - strong [ref=e679]: Autoencoder
+                    - text: "- Dimensionality reduction with latent space extraction"
+                - generic [ref=e680]:
+                  - heading "Neural_Network Examples (/neural_network/)" [level=3] [ref=e681]:
+                    - strong [ref=e682]: Neural_Network Examples
+                    - text: (
+                    - code [ref=e683]: /neural_network/
+                    - text: )
+                  - 'link "Permalink: Neural_Network Examples (/neural_network/)" [ref=e684] [cursor=pointer]':
+                    - /url: "#neural_network-examples-neural_network"
+                    - img [ref=e685]
+                - list [ref=e687]:
+                  - listitem [ref=e688]:
+                    - strong [ref=e689]: Layer Demonstrations
+                    - text: "- Forward/backward propagation examples"
+                  - listitem [ref=e690]:
+                    - strong [ref=e691]: Activation Comparisons
+                    - text: "- Visual analysis of different activation functions"
+                  - listitem [ref=e692]:
+                    - strong [ref=e693]: Weight Initialization
+                    - text: "- Statistical analysis of initialization strategies"
+                  - listitem [ref=e694]:
+                    - strong [ref=e695]: Network Construction
+                    - text: "- Building complete CNN architectures"
+                - generic [ref=e696]:
+                  - heading "📊 Code Metrics & Development Value" [level=2] [ref=e697]
+                  - 'link "Permalink: 📊 Code Metrics & Development Value" [ref=e698] [cursor=pointer]':
+                    - /url: "#-code-metrics--development-value"
+                    - img [ref=e699]
+                - generic [ref=e701]:
+                  - heading "Code Complexity Analysis (via SCC)" [level=3] [ref=e702]:
+                    - strong [ref=e703]: Code Complexity Analysis
+                    - text: (via SCC)
+                  - 'link "Permalink: Code Complexity Analysis (via SCC)" [ref=e704] [cursor=pointer]':
+                    - /url: "#code-complexity-analysis-via-scc"
+                    - img [ref=e705]
+                - generic [ref=e707]:
+                  - code [ref=e709]: "Total Lines of Code: 35,064 ├── Python: 14,393 lines (68 files) ├── Markdown: 11,899 lines (documentation) ├── JSON: 8,232 lines (configuration) └── Other: 540 lines (setup files) Code Complexity: 701 (average 7.3 per file)"
+                  - button "Copy" [ref=e711] [cursor=pointer]:
+                    - img [ref=e712]
+                - generic [ref=e715]:
+                  - heading "Development Value (COCOMO Organic Model)" [level=3] [ref=e716]:
+                    - strong [ref=e717]: Development Value
+                    - text: (COCOMO Organic Model)
+                  - 'link "Permalink: Development Value (COCOMO Organic Model)" [ref=e718] [cursor=pointer]':
+                    - /url: "#development-value-cocomo-organic-model"
+                    - img [ref=e719]
+                - list [ref=e721]:
+                  - listitem [ref=e722]:
+                    - strong [ref=e723]: Estimated Cost
+                    - text: ": $882,614"
+                  - listitem [ref=e724]:
+                    - strong [ref=e725]: Development Time
+                    - text: ": 13.12 months"
+                  - listitem [ref=e726]:
+                    - strong [ref=e727]: Team Size
+                    - text: ": ~6 developers"
+                  - listitem [ref=e728]:
+                    - strong [ref=e729]: Neural Network Libraries Alone
+                    - text: ": $157,292 value"
+                - generic [ref=e730]:
+                  - heading "Library-Specific Metrics" [level=3] [ref=e731]:
+                    - strong [ref=e732]: Library-Specific Metrics
+                  - 'link "Permalink: Library-Specific Metrics" [ref=e733] [cursor=pointer]':
+                    - /url: "#library-specific-metrics"
+                    - img [ref=e734]
+                - generic [ref=e736]:
+                  - code [ref=e738]: "NeuralFlow + Neural_Network Libraries: ├── 4,894 lines of production code ├── 288 complexity points (moderate complexity) ├── 18.6% documentation ratio └── Zero critical issues or bugs"
+                  - button "Copy" [ref=e740] [cursor=pointer]:
+                    - img [ref=e741]
+                - generic [ref=e744]:
+                  - heading "🛠️ Quick Start" [level=2] [ref=e745]
+                  - 'link "Permalink: 🛠️ Quick Start" [ref=e746] [cursor=pointer]':
+                    - /url: "#️-quick-start"
+                    - img [ref=e747]
+                - generic [ref=e749]:
+                  - heading "Install NeuralFlow" [level=3] [ref=e750]:
+                    - strong [ref=e751]: Install NeuralFlow
+                  - 'link "Permalink: Install NeuralFlow" [ref=e752] [cursor=pointer]':
+                    - /url: "#install-neuralflow"
+                    - img [ref=e753]
+                - generic [ref=e755]:
+                  - generic [ref=e756]: cd neuralflow/ pip install -e .
+                  - button "Copy" [ref=e758] [cursor=pointer]:
+                    - img [ref=e759]
+                - generic [ref=e762]:
+                  - heading "Basic Usage" [level=3] [ref=e763]:
+                    - strong [ref=e764]: Basic Usage
+                  - 'link "Permalink: Basic Usage" [ref=e765] [cursor=pointer]':
+                    - /url: "#basic-usage"
+                    - img [ref=e766]
+                - generic [ref=e768]:
+                  - generic [ref=e769]: "import neuralflow as nf import numpy as np # Create model model = nf.Sequential([ nf.layers.Dense(128, activation='relu'), nf.layers.Dense(64, activation='relu'), nf.layers.Dense(10, activation='softmax') ]) # Compile model.compile(optimizer='adam', loss='categorical_crossentropy') # Train X = nf.core.tensor.Tensor(np.random.randn(1000, 784)) y = nf.core.tensor.Tensor(np.random.randn(1000, 10)) model.fit(X, y, epochs=10)"
+                  - button "Copy" [ref=e771] [cursor=pointer]:
+                    - img [ref=e772]
+                - generic [ref=e775]:
+                  - heading "Neural_Network Usage" [level=3] [ref=e776]:
+                    - strong [ref=e777]: Neural_Network Usage
+                  - 'link "Permalink: Neural_Network Usage" [ref=e778] [cursor=pointer]':
+                    - /url: "#neural_network-usage"
+                    - img [ref=e779]
+                - generic [ref=e781]:
+                  - generic [ref=e782]: "import sys sys.path.append('neural_network/') import core # Create layers dense = core.Dense(units=64, activation='relu') conv = core.Conv2D(filters=32, kernel_size=(3, 3)) # Forward pass x = np.random.randn(32, 784) output = dense.forward(x)"
+                  - button "Copy" [ref=e784] [cursor=pointer]:
+                    - img [ref=e785]
+                - generic [ref=e788]:
+                  - heading "📚 Documentation" [level=2] [ref=e789]
+                  - 'link "Permalink: 📚 Documentation" [ref=e790] [cursor=pointer]':
+                    - /url: "#-documentation"
+                    - img [ref=e791]
+                - generic [ref=e793]:
+                  - heading "Complete Documentation Available:" [level=3] [ref=e794]:
+                    - strong [ref=e795]: "Complete Documentation Available:"
+                  - 'link "Permalink: Complete Documentation Available:" [ref=e796] [cursor=pointer]':
+                    - /url: "#complete-documentation-available"
+                    - img [ref=e797]
+                - list [ref=e799]:
+                  - listitem [ref=e800]:
+                    - strong [ref=e801]: API Reference
+                    - text: "- Complete class and method documentation"
+                  - listitem [ref=e802]:
+                    - strong [ref=e803]: Getting Started Guide
+                    - text: "- Step-by-step tutorials for beginners"
+                  - listitem [ref=e804]:
+                    - strong [ref=e805]: Advanced Examples
+                    - text: "- Complex architectures and use cases"
+                  - listitem [ref=e806]:
+                    - strong [ref=e807]: Performance Guide
+                    - text: "- Optimization strategies and benchmarks"
+                  - listitem [ref=e808]:
+                    - strong [ref=e809]: Architecture Overview
+                    - text: "- System design and component interaction"
+                - generic [ref=e810]:
+                  - heading "Key Documentation Files:" [level=3] [ref=e811]:
+                    - strong [ref=e812]: "Key Documentation Files:"
+                  - 'link "Permalink: Key Documentation Files:" [ref=e813] [cursor=pointer]':
+                    - /url: "#key-documentation-files"
+                    - img [ref=e814]
+                - list [ref=e816]:
+                  - listitem [ref=e817]:
+                    - code [ref=e818]: /neuralflow/README.md
+                    - text: "- NeuralFlow library documentation"
+                  - listitem [ref=e819]:
+                    - code [ref=e820]: /neural_network/README.md
+                    - text: "- Educational library guide"
+                  - listitem [ref=e821]:
+                    - code [ref=e822]: /neuralflow/notebooks/
+                    - text: "- Interactive Jupyter examples"
+                  - listitem [ref=e823]:
+                    - code [ref=e824]: /tests/README.md
+                    - text: "- Testing framework documentation"
+                - generic [ref=e825]:
+                  - heading "🎯 Use Cases & Benefits" [level=2] [ref=e826]
+                  - 'link "Permalink: 🎯 Use Cases & Benefits" [ref=e827] [cursor=pointer]':
+                    - /url: "#-use-cases--benefits"
+                    - img [ref=e828]
+                - generic [ref=e830]:
+                  - heading "Educational Applications" [level=3] [ref=e831]:
+                    - strong [ref=e832]: Educational Applications
+                  - 'link "Permalink: Educational Applications" [ref=e833] [cursor=pointer]':
+                    - /url: "#educational-applications"
+                    - img [ref=e834]
+                - list [ref=e836]:
+                  - listitem [ref=e837]:
+                    - strong [ref=e838]: University Courses
+                    - text: "- Clear implementations for learning neural network fundamentals"
+                  - listitem [ref=e839]:
+                    - strong [ref=e840]: Research Prototyping
+                    - text: "- Quick testing of new architectural ideas"
+                  - listitem [ref=e841]:
+                    - strong [ref=e842]: Algorithm Development
+                    - text: "- Pure implementations without framework complexity"
+                - generic [ref=e843]:
+                  - heading "Production Applications" [level=3] [ref=e844]:
+                    - strong [ref=e845]: Production Applications
+                  - 'link "Permalink: Production Applications" [ref=e846] [cursor=pointer]':
+                    - /url: "#production-applications"
+                    - img [ref=e847]
+                - list [ref=e849]:
+                  - listitem [ref=e850]:
+                    - strong [ref=e851]: Edge Deployment
+                    - text: "- CPU-optimized for resource-constrained environments"
+                  - listitem [ref=e852]:
+                    - strong [ref=e853]: Custom Architectures
+                    - text: "- Full control over model design and training"
+                  - listitem [ref=e854]:
+                    - strong [ref=e855]: Research & Development
+                    - text: "- Transparent implementations for experimentation"
+                - generic [ref=e856]:
+                  - heading "Key Benefits" [level=3] [ref=e857]:
+                    - strong [ref=e858]: Key Benefits
+                  - 'link "Permalink: Key Benefits" [ref=e859] [cursor=pointer]':
+                    - /url: "#key-benefits"
+                    - img [ref=e860]
+                - list [ref=e862]:
+                  - listitem [ref=e863]:
+                    - text: ✅
+                    - strong [ref=e864]: Zero GPU Dependency
+                    - text: "- Runs efficiently on any CPU"
+                  - listitem [ref=e865]:
+                    - text: ✅
+                    - strong [ref=e866]: Complete Transparency
+                    - text: "- Full access to all implementation details"
+                  - listitem [ref=e867]:
+                    - text: ✅
+                    - strong [ref=e868]: High Performance
+                    - text: "- Optimized for CPU execution with significant speedups"
+                  - listitem [ref=e869]:
+                    - text: ✅
+                    - strong [ref=e870]: Production Ready
+                    - text: "- Comprehensive testing and error handling"
+                  - listitem [ref=e871]:
+                    - text: ✅
+                    - strong [ref=e872]: Educational Value
+                    - text: "- Clear, documented implementations"
+                - generic [ref=e873]:
+                  - heading "🏗️ Architecture Highlights" [level=2] [ref=e874]
+                  - 'link "Permalink: 🏗️ Architecture Highlights" [ref=e875] [cursor=pointer]':
+                    - /url: "#️-architecture-highlights"
+                    - img [ref=e876]
+                - generic [ref=e878]:
+                  - heading "Modular Design" [level=3] [ref=e879]:
+                    - strong [ref=e880]: Modular Design
+                  - 'link "Permalink: Modular Design" [ref=e881] [cursor=pointer]':
+                    - /url: "#modular-design"
+                    - img [ref=e882]
+                - list [ref=e884]:
+                  - listitem [ref=e885]:
+                    - strong [ref=e886]: Separation of Concerns
+                    - text: "- Clear boundaries between components"
+                  - listitem [ref=e887]:
+                    - strong [ref=e888]: Extensible Framework
+                    - text: "- Easy to add new layers and operations"
+                  - listitem [ref=e889]:
+                    - strong [ref=e890]: Pluggable Components
+                    - text: "- Swap optimizers, losses, and activations seamlessly"
+                - generic [ref=e891]:
+                  - heading "CPU Optimization Strategies" [level=3] [ref=e892]:
+                    - strong [ref=e893]: CPU Optimization Strategies
+                  - 'link "Permalink: CPU Optimization Strategies" [ref=e894] [cursor=pointer]':
+                    - /url: "#cpu-optimization-strategies"
+                    - img [ref=e895]
+                - list [ref=e897]:
+                  - listitem [ref=e898]:
+                    - strong [ref=e899]: Memory Access Patterns
+                    - text: "- Cache-friendly data layouts and algorithms"
+                  - listitem [ref=e900]:
+                    - strong [ref=e901]: Vectorization
+                    - text: "- SIMD instruction utilization through NumPy"
+                  - listitem [ref=e902]:
+                    - strong [ref=e903]: Parallelization
+                    - text: "- Multi-core processing for batch operations"
+                  - listitem [ref=e904]:
+                    - strong [ref=e905]: Numerical Stability
+                    - text: "- Careful handling of floating-point operations"
+                - generic [ref=e906]:
+                  - heading "🌟 Why This Demonstrates Claude-Flow's Power" [level=2] [ref=e907]
+                  - 'link "Permalink: 🌟 Why This Demonstrates Claude-Flow''s Power" [ref=e908] [cursor=pointer]':
+                    - /url: "#-why-this-demonstrates-claude-flows-power"
+                    - img [ref=e909]
+                - paragraph [ref=e911]:
+                  - text: This project serves as a
+                  - strong [ref=e912]: compelling demonstration
+                  - text: "of what's possible with Claude-Flow and Claude Code:"
+                - generic [ref=e913]:
+                  - heading "🚀 Development Speed" [level=3] [ref=e914]:
+                    - strong [ref=e915]: 🚀 Development Speed
+                  - 'link "Permalink: 🚀 Development Speed" [ref=e916] [cursor=pointer]':
+                    - /url: "#-development-speed"
+                    - img [ref=e917]
+                - list [ref=e919]:
+                  - listitem [ref=e920]:
+                    - strong [ref=e921]: Traditional Approach
+                    - text: ": 13+ months with 6 developers ($882K+ cost)"
+                  - listitem [ref=e922]:
+                    - strong [ref=e923]: Claude-Flow Approach
+                    - text: ": Single session with coordinated AI agents"
+                  - listitem [ref=e924]:
+                    - strong [ref=e925]: Result
+                    - text: ": 100x faster development with equivalent quality"
+                - generic [ref=e926]:
+                  - heading "🎯 Quality & Completeness" [level=3] [ref=e927]:
+                    - strong [ref=e928]: 🎯 Quality & Completeness
+                  - 'link "Permalink: 🎯 Quality & Completeness" [ref=e929] [cursor=pointer]':
+                    - /url: "#-quality--completeness"
+                    - img [ref=e930]
+                - list [ref=e932]:
+                  - listitem [ref=e933]:
+                    - text: ✅
+                    - strong [ref=e934]: Production-ready code
+                    - text: with comprehensive error handling
+                  - listitem [ref=e935]:
+                    - text: ✅
+                    - strong [ref=e936]: Complete test suite
+                    - text: (104 tests) with gradient validation
+                  - listitem [ref=e937]:
+                    - text: ✅
+                    - strong [ref=e938]: Full documentation
+                    - text: including API reference and tutorials
+                  - listitem [ref=e939]:
+                    - text: ✅
+                    - strong [ref=e940]: Working demonstrations
+                    - text: across multiple use cases
+                  - listitem [ref=e941]:
+                    - text: ✅
+                    - strong [ref=e942]: Performance optimizations
+                    - text: delivering 50x speedups
+                - generic [ref=e943]:
+                  - heading "🤖 AI Coordination Benefits" [level=3] [ref=e944]:
+                    - strong [ref=e945]: 🤖 AI Coordination Benefits
+                  - 'link "Permalink: 🤖 AI Coordination Benefits" [ref=e946] [cursor=pointer]':
+                    - /url: "#-ai-coordination-benefits"
+                    - img [ref=e947]
+                - list [ref=e949]:
+                  - listitem [ref=e950]:
+                    - strong [ref=e951]: Parallel Development
+                    - text: ": All components built simultaneously"
+                  - listitem [ref=e952]:
+                    - strong [ref=e953]: Specialized Expertise
+                    - text: ": Each agent focused on their domain"
+                  - listitem [ref=e954]:
+                    - strong [ref=e955]: Quality Assurance
+                    - text: ": Automated testing throughout development"
+                  - listitem [ref=e956]:
+                    - strong [ref=e957]: Knowledge Sharing
+                    - text: ": Memory-driven coordination between agents"
+                - generic [ref=e958]:
+                  - heading "📈 Scalability Demonstration" [level=3] [ref=e959]:
+                    - strong [ref=e960]: 📈 Scalability Demonstration
+                  - 'link "Permalink: 📈 Scalability Demonstration" [ref=e961] [cursor=pointer]':
+                    - /url: "#-scalability-demonstration"
+                    - img [ref=e962]
+                - paragraph [ref=e964]: "This neural network project proves Claude-Flow can handle:"
+                - list [ref=e965]:
+                  - listitem [ref=e966]:
+                    - strong [ref=e967]: Complex technical requirements
+                    - text: (gradient computation, optimization)
+                  - listitem [ref=e968]:
+                    - strong [ref=e969]: Multiple interdependent components
+                    - text: (tensors, layers, optimizers)
+                  - listitem [ref=e970]:
+                    - strong [ref=e971]: Performance-critical code
+                    - text: (CPU optimization, vectorization)
+                  - listitem [ref=e972]:
+                    - strong [ref=e973]: Complete software lifecycle
+                    - text: (design → implement → test → document)
+                - generic [ref=e974]:
+                  - heading "🔬 Replicating This Demo" [level=2] [ref=e975]
+                  - 'link "Permalink: 🔬 Replicating This Demo" [ref=e976] [cursor=pointer]':
+                    - /url: "#-replicating-this-demo"
+                    - img [ref=e977]
+                - paragraph [ref=e979]: "To build similar projects with Claude-Flow:"
+                - list [ref=e980]:
+                  - listitem [ref=e981]:
+                    - strong [ref=e982]: Install the tools
+                    - text: (see installation section above)
+                  - listitem [ref=e983]:
+                    - strong [ref=e984]: Define your objective
+                    - text: clearly and specifically
+                  - listitem [ref=e985]:
+                    - strong [ref=e986]: Run the swarm command
+                    - text: ":"
+                    - code [ref=e987]: ./claude-flow swarm "your project description"
+                  - listitem [ref=e988]:
+                    - strong [ref=e989]: Monitor progress
+                    - text: as agents coordinate and deliver results
+                  - listitem [ref=e990]:
+                    - strong [ref=e991]: Validate the output
+                    - text: "- all code is production-ready"
+                - generic [ref=e992]:
+                  - heading "Example Commands for Different Projects" [level=3] [ref=e993]:
+                    - strong [ref=e994]: Example Commands for Different Projects
+                  - 'link "Permalink: Example Commands for Different Projects" [ref=e995] [cursor=pointer]':
+                    - /url: "#example-commands-for-different-projects"
+                    - img [ref=e996]
+                - generic [ref=e998]:
+                  - generic [ref=e999]:
+                    - generic [ref=e1000]: "# Web application development"
+                    - text: ./claude-flow swarm
+                    - generic [ref=e1001]: "\"build a full-stack e-commerce website with React and Node.js\""
+                    - generic [ref=e1002]: "# Data analysis project"
+                    - text: ./claude-flow swarm
+                    - generic [ref=e1003]: "\"create a comprehensive data analysis pipeline for financial data\""
+                    - generic [ref=e1004]: "# Game development"
+                    - text: ./claude-flow swarm
+                    - generic [ref=e1005]: "\"develop a 2D puzzle game with physics engine in Python\""
+                    - generic [ref=e1006]: "# API development"
+                    - text: ./claude-flow swarm
+                    - generic [ref=e1007]: "\"build a RESTful API with authentication and database integration\""
+                  - button "Copy" [ref=e1009] [cursor=pointer]:
+                    - img [ref=e1010]
+                - generic [ref=e1013]:
+                  - heading "🤝 Contributing" [level=2] [ref=e1014]
+                  - 'link "Permalink: 🤝 Contributing" [ref=e1015] [cursor=pointer]':
+                    - /url: "#-contributing"
+                    - img [ref=e1016]
+                - paragraph [ref=e1018]: "This project showcases the capabilities of Claude Code's swarm orchestration system. The codebase is production-ready and fully documented, making it suitable for:"
+                - list [ref=e1019]:
+                  - listitem [ref=e1020]:
+                    - strong [ref=e1021]: Educational use
+                    - text: in machine learning courses
+                  - listitem [ref=e1022]:
+                    - strong [ref=e1023]: Research applications
+                    - text: requiring transparent implementations
+                  - listitem [ref=e1024]:
+                    - strong [ref=e1025]: Production deployment
+                    - text: in CPU-constrained environments
+                  - listitem [ref=e1026]:
+                    - strong [ref=e1027]: Extension and customization
+                    - text: for specialized use cases
+                  - listitem [ref=e1028]:
+                    - strong [ref=e1029]: Demonstration
+                    - text: of Claude-Flow's development capabilities
+                - generic [ref=e1030]:
+                  - heading "📞 Contact & Support" [level=2] [ref=e1031]
+                  - 'link "Permalink: 📞 Contact & Support" [ref=e1032] [cursor=pointer]':
+                    - /url: "#-contact--support"
+                    - img [ref=e1033]
+                - paragraph [ref=e1035]:
+                  - text: Built entirely through
+                  - strong [ref=e1036]: Claude Code's swarm orchestration
+                  - text: "- demonstrating the future of AI-powered software development where multiple specialized agents collaborate to deliver complex, production-ready systems."
+                - separator [ref=e1037]
+                - paragraph [ref=e1038]:
+                  - strong [ref=e1039]: 🔬 Research Value
+                  - text: ": Demonstrates advanced multi-agent AI collaboration"
+                  - strong [ref=e1040]: 💻 Production Value
+                  - text: ": $882,614 estimated development effort delivered"
+                  - strong [ref=e1041]: 🎓 Educational Value
+                  - text: ": Clear implementations suitable for learning and teaching"
+                  - strong [ref=e1042]: ⚡ Performance Value
+                  - text: ": Up to 50x speedups through intelligent optimization"
+                - paragraph [ref=e1043]:
+                  - emphasis [ref=e1044]: This project represents a breakthrough in AI-assisted software development, showcasing how swarm intelligence can deliver enterprise-grade solutions.
+        - generic [ref=e1048]:
+          - generic [ref=e1051]:
+            - heading "About" [level=2] [ref=e1052]
+            - paragraph [ref=e1053]: AI-Powered Neural Network Libraries built with Claude-Flow Swarm Orchestration. Live demo from Agentics Foundation meetup in Toronto - showcasing how 10 specialized AI agents built production-ready neural network frameworks worth $882K+ in a single session.
+            - heading "Resources" [level=3] [ref=e1054]
+            - link "Readme" [ref=e1056] [cursor=pointer]:
+              - /url: "#readme-ov-file"
+              - img [ref=e1057]
+              - text: Readme
+            - heading "License" [level=3] [ref=e1059]
+            - link "MIT license" [ref=e1061] [cursor=pointer]:
+              - /url: "#MIT-1-ov-file"
+              - img [ref=e1062]
+              - text: MIT license
+            - link "Activity" [ref=e1065] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/activity
+              - img [ref=e1066]
+              - text: Activity
+            - heading "Stars" [level=3] [ref=e1068]
+            - link "31 stars" [ref=e1070] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/stargazers
+              - img [ref=e1071]
+              - strong [ref=e1073]: "31"
+              - text: stars
+            - heading "Watchers" [level=3] [ref=e1074]
+            - link "1 watching" [ref=e1076] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/watchers
+              - img [ref=e1077]
+              - strong [ref=e1079]: "1"
+              - text: watching
+            - heading "Forks" [level=3] [ref=e1080]
+            - link "12 forks" [ref=e1082] [cursor=pointer]:
+              - /url: /ruvnet/yyz-agentics-june/forks
+              - img [ref=e1083]
+              - strong [ref=e1085]: "12"
+              - text: forks
+            - link "Report repository" [ref=e1087] [cursor=pointer]:
+              - /url: /contact/report-content?content_url=https%3A%2F%2Fgithub.com%2Fruvnet%2Fyyz-agentics-june&report=ruvnet+%28user%29
+          - generic [ref=e1089]:
+            - heading "Releases" [level=2] [ref=e1090]:
+              - link "Releases" [ref=e1091] [cursor=pointer]:
+                - /url: /ruvnet/yyz-agentics-june/releases
+            - generic [ref=e1092]: No releases published
+          - generic [ref=e1094]:
+            - heading "Packages" [level=2] [ref=e1095]:
+              - link "Packages" [ref=e1096] [cursor=pointer]:
+                - /url: /users/ruvnet/packages?repo_name=yyz-agentics-june
+            - generic [ref=e1097]: No packages published
+          - generic [ref=e1099]:
+            - heading "Contributors 1" [level=2] [ref=e1100]:
+              - link "Contributors 1" [ref=e1101] [cursor=pointer]:
+                - /url: /ruvnet/yyz-agentics-june/graphs/contributors
+                - text: Contributors
+                - generic "1" [ref=e1102]
+            - list [ref=e1103]:
+              - listitem [ref=e1104]:
+                - link "@ruvnet" [ref=e1105] [cursor=pointer]:
+                  - /url: https://github.com/ruvnet
+                  - img "@ruvnet" [ref=e1106]
+                - link "ruvnet rUv" [ref=e1108] [cursor=pointer]:
+                  - /url: https://github.com/ruvnet
+                  - strong [ref=e1109]: ruvnet
+                  - text: rUv
+          - generic [ref=e1111]:
+            - heading "Languages" [level=2] [ref=e1112]
+            - list [ref=e1116]:
+              - listitem [ref=e1117]:
+                - link "Python 100.0%" [ref=e1118] [cursor=pointer]:
+                  - /url: /ruvnet/yyz-agentics-june/search?l=python
+                  - img [ref=e1119]
+                  - generic [ref=e1121]: Python
+                  - generic [ref=e1122]: 100.0%
+  - contentinfo [ref=e1124]:
+    - heading "Footer" [level=2] [ref=e1125]
+    - generic [ref=e1126]:
+      - generic [ref=e1127]:
+        - link "GitHub Homepage" [ref=e1128] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e1129]
+        - generic [ref=e1131]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e1132]:
+        - heading "Footer navigation" [level=3] [ref=e1133]
+        - list "Footer navigation" [ref=e1134]:
+          - listitem [ref=e1135]:
+            - link "Terms" [ref=e1136] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e1137]:
+            - link "Privacy" [ref=e1138] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e1139]:
+            - link "Security" [ref=e1140] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e1141]:
+            - link "Status" [ref=e1142] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e1143]:
+            - link "Community" [ref=e1144] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e1145]:
+            - link "Docs" [ref=e1146] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e1147]:
+            - link "Contact" [ref=e1148] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e1149]:
+            - button "Manage cookies" [ref=e1151] [cursor=pointer]
+          - listitem [ref=e1152]:
+            - button "Do not share my personal information" [ref=e1154] [cursor=pointer]
