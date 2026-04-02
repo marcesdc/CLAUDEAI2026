@@ -53,6 +53,12 @@ TEST_SPLIT = 0.05
 SEED = 42
 
 # ---------------------------------------------------------------------------
+# Loss
+# ---------------------------------------------------------------------------
+FOCAL_GAMMA = 2.0   # focal loss modulating exponent; 0 = standard BCE
+FOCAL_ALPHA = 0.25  # positive-class weight; None = no alpha weighting
+
+# ---------------------------------------------------------------------------
 # Prediction
 # ---------------------------------------------------------------------------
 NUM_PLAYS = 5              # how many plays (tickets) to generate
