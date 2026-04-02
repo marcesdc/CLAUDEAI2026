@@ -44,24 +44,30 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 sys.path.insert(0, os.path.dirname(__file__))
 
+from src.bandit import (
+    default_entry,
+    summary as bandit_summary,
+    temperature_from_weight,
+    update as bandit_update,
+)
 from src.model_swarm import SharedLotteryTransformer, count_params, SEQ_LEN
 from src.preprocessing_swarm import (
     LOTTERY_CONFIGS,
     build_all_lottery_data,
-    build_features,
     get_last_window,
-    load_lottery_df,
     split,
 )
 
-SWARM_CHECKPOINT = "models/best_swarm.pt"
-SWARM_STATE_FILE = "data/swarm_state.json"
+SWARM_CHECKPOINT  = "models/best_swarm.pt"
+SWARM_STATE_FILE  = "data/swarm_state.json"
+SWARM_PRED_LOG    = "data/swarm_predictions_log.csv"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -139,12 +145,22 @@ def cmd_predict(args):
     model.load_state_dict(torch.load(SWARM_CHECKPOINT, map_location=DEVICE))
     model.eval()
 
+    # Adjust temperature using Thompson weight: low confidence -> more exploration
+    temperature = args.temperature
+    state = _load_swarm_state()
+    agent_weights = state.get("agent_weights", {})
+    entry = agent_weights.get(lottery, default_entry())
+    if entry.get("draws_scored", 0) > 0:
+        temperature = temperature_from_weight(entry["weight"])
+        print(f"[swarm] Thompson weight={entry['weight']:.3f} -> temperature={temperature}")
+
     window = get_last_window(lottery, seq_len=SEQ_LEN)
     plays  = _sample_plays(
         model, window, cfg,
-        n=args.plays, temperature=args.temperature,
+        n=args.plays, temperature=temperature,
     )
     _print_plays(plays, cfg)
+    _save_swarm_prediction(lottery, plays)
 
 
 def cmd_log(args):
@@ -169,43 +185,49 @@ def cmd_log(args):
         sys.exit(1)
 
     main_max  = cfg["main_max"]
-    bonus_max = cfg["bonus_max"]
+    has_bonus = cfg.get("has_bonus", True)
     for n in args.numbers:
         if not (1 <= n <= main_max):
             print(f"[swarm] Number {n} is outside 1-{main_max}.")
             sys.exit(1)
-    if not (1 <= args.bonus <= bonus_max):
-        print(f"[swarm] Bonus {args.bonus} is outside 1-{bonus_max}.")
-        sys.exit(1)
+    if has_bonus:
+        bonus_max = cfg["bonus_max"]
+        if args.bonus is None or not (1 <= args.bonus <= bonus_max):
+            print(f"[swarm] --bonus is required for {cfg['name']} and must be 1-{bonus_max}.")
+            sys.exit(1)
 
-    bonus_col = cfg["bonus_col"]
-    row_cols  = ["date"] + [f"n{i}" for i in range(1, main_count + 1)] + [bonus_col]
-    row_vals  = [date] + sorted(args.numbers) + [args.bonus]
-    row       = dict(zip(row_cols, row_vals))
+    if has_bonus:
+        bonus_col = cfg["bonus_col"]
+        row_cols  = ["date"] + [f"n{i}" for i in range(1, main_count + 1)] + [bonus_col]
+        row_vals  = [date] + sorted(args.numbers) + [args.bonus]
+    else:
+        row_cols  = ["date"] + [f"n{i}" for i in range(1, main_count + 1)]
+        row_vals  = [date] + sorted(args.numbers)
+    row = dict(zip(row_cols, row_vals))
 
-    import pandas as pd
     if Path(csv_path).exists():
         df = pd.read_csv(csv_path)
         if date in df["date"].astype(str).values:
-            print(f"[swarm] Draw for {date} already exists — skipping.")
+            print(f"[swarm] Draw for {date} already exists -- skipping.")
             return
-        import pandas as pd
         df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
     else:
         df = pd.DataFrame([row])
 
     df.to_csv(csv_path, index=False)
-    print(f"[swarm] {cfg['name']} draw logged: {date}  {sorted(args.numbers)}  bonus={args.bonus}")
+    bonus_info = f"  bonus={args.bonus}" if has_bonus else ""
+    print(f"[swarm] {cfg['name']} draw logged: {date}  {sorted(args.numbers)}{bonus_info}")
 
-    _update_swarm_state(lottery=lottery, hits=None, draw_date=date)
+    # Score last swarm prediction for this lottery and update Thompson weights
+    hits = _score_swarm_prediction(lottery, args.numbers, cfg["main_count"])
+    _update_swarm_state(lottery=lottery, hits=hits, draw_date=date)
 
 
 def cmd_status(_args):
     if not Path(SWARM_STATE_FILE).exists():
         print("[swarm] No swarm_state.json found.")
         return
-    with open(SWARM_STATE_FILE) as f:
-        state = json.load(f)
+    state = _load_swarm_state()
 
     print("\n=== Swarm Status ===")
     print(f"  Joint training runs : {state.get('joint_train_count', 0)}")
@@ -214,17 +236,13 @@ def cmd_status(_args):
     print()
     print("  Last scores:")
     for name, info in state.get("last_scores", {}).items():
-        hits = info.get("hits", "n/a")
-        date = info.get("date", "n/a")
-        cfg  = LOTTERY_CONFIGS.get(name, {})
-        label = cfg.get("name", name)
+        hits  = info.get("hits", "n/a")
+        date  = info.get("date", "n/a")
+        label = LOTTERY_CONFIGS.get(name, {}).get("name", name)
         print(f"    {label:14s}  hits={hits}  date={date}")
     print()
-    print("  Agent weights:")
-    for name, weights in state.get("agent_weights", {}).items():
-        cfg   = LOTTERY_CONFIGS.get(name, {})
-        label = cfg.get("name", name)
-        print(f"    {label:14s}  {weights}")
+    print("  Thompson agent weights (Beta posterior):")
+    print(bandit_summary(state.get("agent_weights", {}), LOTTERY_CONFIGS))
     print()
 
 
@@ -278,8 +296,9 @@ def _run_joint_epoch(model, loaders: dict, optimizer, train: bool) -> float:
                 main_logits, bonus_logits = model(x, lottery_id=lid)
 
                 loss = main_crit(main_logits, y_main)
-                bonus_target = y_bonus.argmax(dim=1)
-                loss = loss + 0.3 * bonus_crit(bonus_logits, bonus_target)
+                if LOTTERY_CONFIGS[name].get("has_bonus", True):
+                    bonus_target = y_bonus.argmax(dim=1)
+                    loss = loss + 0.3 * bonus_crit(bonus_logits, bonus_target)
 
                 if train:
                     optimizer.zero_grad()
@@ -310,8 +329,9 @@ def _sample_plays(model, window: np.ndarray, cfg: dict, n: int, temperature: flo
     main_count = cfg["main_count"]
     main_max   = cfg["main_max"]
     bonus_max  = cfg["bonus_max"]
-    lines_per  = 3
+    lines_per  = cfg.get("lines_per", 3)
 
+    has_bonus = cfg.get("has_bonus", True)
     rng   = np.random.default_rng()
     plays = []
     for _ in range(n):
@@ -322,7 +342,7 @@ def _sample_plays(model, window: np.ndarray, cfg: dict, n: int, temperature: flo
                 for v in rng.choice(main_max, size=main_count, replace=False, p=main_probs[:main_max])
             )
             lines.append(nums)
-        bonus_num = int(rng.choice(bonus_max, p=bonus_probs[:bonus_max]) + 1)
+        bonus_num = int(rng.choice(bonus_max, p=bonus_probs[:bonus_max]) + 1) if has_bonus else None
         plays.append({"lines": lines, "bonus": bonus_num})
     return plays
 
@@ -347,7 +367,8 @@ def _print_plays(plays: list, cfg: dict) -> None:
         for line_idx, line in enumerate(play["lines"], 1):
             nums_str = "  ".join(f"{n:2d}" for n in line)
             print(f"  Line {line_idx}:  {nums_str}")
-        print(f"  {bonus_col}:  {play['bonus']:2d}")
+        if play["bonus"] is not None:
+            print(f"  {bonus_col}:  {play['bonus']:2d}")
     print(f"\n{'=' * width}")
     print("  Reminder: lottery outcomes are random. Play responsibly.")
     print(f"{'=' * width}\n")
@@ -357,12 +378,15 @@ def _print_plays(plays: list, cfg: dict) -> None:
 # Swarm state helpers
 # ---------------------------------------------------------------------------
 
-def _update_swarm_state(lottery: str = None, hits=None, draw_date: str = None, joint_val_loss=None):
-    state = {}
+def _load_swarm_state() -> dict:
     if Path(SWARM_STATE_FILE).exists():
-        with open(SWARM_STATE_FILE) as f:
-            state = json.load(f)
+        with open(SWARM_STATE_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    return {}
 
+
+def _update_swarm_state(lottery: str = None, hits=None, draw_date: str = None, joint_val_loss=None):
+    state = _load_swarm_state()
     state["last_updated"] = datetime.today().strftime("%Y-%m-%d")
 
     if joint_val_loss is not None:
@@ -374,9 +398,62 @@ def _update_swarm_state(lottery: str = None, hits=None, draw_date: str = None, j
             "hits": hits,
             "date": draw_date or datetime.today().strftime("%Y-%m-%d"),
         }
+        cfg = LOTTERY_CONFIGS[lottery]
+        weights = state.setdefault("agent_weights", {})
+        state["agent_weights"] = bandit_update(weights, lottery, hits, cfg["main_count"])
 
-    with open(SWARM_STATE_FILE, "w") as f:
+    with open(SWARM_STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, indent=2)
+
+
+def _save_swarm_prediction(lottery: str, plays: list) -> None:
+    """Append generated plays to the swarm prediction log for later scoring."""
+    pred_date = datetime.today().strftime("%Y-%m-%d")
+    records = []
+    for play_idx, play in enumerate(plays, 1):
+        for line_idx, line in enumerate(play["lines"], 1):
+            records.append({
+                "pred_date": pred_date,
+                "lottery":   lottery,
+                "play":      play_idx,
+                "line":      line_idx,
+                "numbers":   " ".join(str(n) for n in line),
+                "bonus":     play["bonus"] if play["bonus"] is not None else "",
+            })
+    df_new = pd.DataFrame(records)
+    if Path(SWARM_PRED_LOG).exists():
+        df_new = pd.concat([pd.read_csv(SWARM_PRED_LOG), df_new], ignore_index=True)
+    df_new.to_csv(SWARM_PRED_LOG, index=False)
+    print(f"[swarm] Predictions saved to '{SWARM_PRED_LOG}'.")
+
+
+def _score_swarm_prediction(lottery: str, actual_numbers: list, main_count: int):
+    """
+    Score the most recent swarm prediction for *lottery* against *actual_numbers*.
+    Returns the best (max) hit count across all lines, or None if no prediction exists.
+    """
+    if not Path(SWARM_PRED_LOG).exists():
+        print("[swarm] No swarm prediction log found -- skipping scoring.")
+        return None
+
+    df = pd.read_csv(SWARM_PRED_LOG)
+    df_lot = df[df["lottery"] == lottery]
+    if df_lot.empty:
+        print(f"[swarm] No saved predictions for {lottery} -- skipping scoring.")
+        return None
+
+    latest_date = df_lot["pred_date"].max()
+    latest = df_lot[df_lot["pred_date"] == latest_date]
+
+    actual_set = set(actual_numbers)
+    best_hits = 0
+    for _, row in latest.iterrows():
+        predicted = {int(n) for n in str(row["numbers"]).split()}
+        hits = len(predicted & actual_set)
+        best_hits = max(best_hits, hits)
+
+    print(f"[swarm] Scored prediction ({latest_date}): best={best_hits}/{main_count} hits.")
+    return best_hits
 
 
 def _plot_training(history: dict) -> None:
@@ -428,7 +505,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_log.add_argument("--lottery", required=True, choices=["649", "dailygrand"])
     p_log.add_argument("--date",    default="")
     p_log.add_argument("--numbers", type=int, nargs="+", required=True)
-    p_log.add_argument("--bonus",   type=int, required=True)
+    p_log.add_argument("--bonus",   type=int, default=None)
 
     # status
     sub.add_parser("status", help="Show swarm state")

@@ -28,7 +28,7 @@ SCORE_LOG  = "data/score_log.csv"
 # Logging a new draw
 # ---------------------------------------------------------------------------
 
-def log_draw(date: str, numbers: list[int], bonus: int) -> None:
+def log_draw(date: str, numbers: list[int]) -> None:
     """
     Append a new draw to draws.csv.
 
@@ -36,7 +36,6 @@ def log_draw(date: str, numbers: list[int], bonus: int) -> None:
     ----------
     date    : date string, e.g. '2026-03-25'
     numbers : list of 7 ints (main balls)
-    bonus   : int
     """
     if len(numbers) != config.LOTTERY["main_count"]:
         raise ValueError(f"Expected {config.LOTTERY['main_count']} numbers, got {len(numbers)}.")
@@ -51,10 +50,8 @@ def log_draw(date: str, numbers: list[int], bonus: int) -> None:
     for n in numbers:
         if not (1 <= n <= main_max):
             raise ValueError(f"Number {n} is outside 1-{main_max}.")
-    if not (1 <= bonus <= config.LOTTERY["bonus_max"]):
-        raise ValueError(f"Bonus {bonus} is outside 1-{config.LOTTERY['bonus_max']}.")
 
-    row = {"date": date, **{f"n{i+1}": v for i, v in enumerate(sorted(numbers))}, "bonus": bonus}
+    row = {"date": date, **{f"n{i+1}": v for i, v in enumerate(sorted(numbers))}}
     csv_path = config.RAW_CSV
 
     if Path(csv_path).exists():
@@ -69,7 +66,7 @@ def log_draw(date: str, numbers: list[int], bonus: int) -> None:
         df = pd.DataFrame([row])
 
     df.to_csv(csv_path, index=False)
-    print(f"[feedback] Draw logged: {date}  {sorted(numbers)}  bonus={bonus}")
+    print(f"[feedback] Draw logged: {date}  {sorted(numbers)}")
 
 
 # ---------------------------------------------------------------------------
@@ -92,7 +89,6 @@ def save_prediction(plays: list[dict], draw_date: str = "") -> None:
                 "play": play_idx,
                 "line": line_idx,
                 "numbers": " ".join(str(n) for n in line),
-                "bonus": play["bonus"],
             })
 
     df_new = pd.DataFrame(records)
@@ -102,7 +98,7 @@ def save_prediction(plays: list[dict], draw_date: str = "") -> None:
     print(f"[feedback] Predictions saved to '{PRED_LOG}'.")
 
 
-def score_last_prediction(actual_numbers: list[int], actual_bonus: int, draw_date: str = "") -> pd.DataFrame:
+def score_last_prediction(actual_numbers: list[int], draw_date: str = "") -> pd.DataFrame:
     """
     Score the most recently saved prediction against the actual draw.
     Prints a summary and appends results to score_log.csv.
@@ -126,7 +122,6 @@ def score_last_prediction(actual_numbers: list[int], actual_bonus: int, draw_dat
     for _, row in latest.iterrows():
         predicted = set(int(n) for n in str(row["numbers"]).split())
         hits = len(predicted & actual_set)
-        bonus_hit = int(row["bonus"]) == actual_bonus
         rows.append({
             "draw_date":   draw_date,
             "play":        row["play"],
@@ -134,11 +129,10 @@ def score_last_prediction(actual_numbers: list[int], actual_bonus: int, draw_dat
             "predicted":   row["numbers"],
             "actual":      " ".join(str(n) for n in sorted(actual_numbers)),
             "hits":        hits,
-            "bonus_hit":   bonus_hit,
         })
 
     df_scores = pd.DataFrame(rows)
-    _print_score_summary(df_scores, actual_numbers, actual_bonus)
+    _print_score_summary(df_scores, actual_numbers)
 
     # Append to score log
     if Path(SCORE_LOG).exists():
@@ -168,13 +162,12 @@ def recency_weights(n_samples: int, decay: float = 0.92) -> np.ndarray:
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _print_score_summary(df: pd.DataFrame, actual: list[int], bonus: int) -> None:
+def _print_score_summary(df: pd.DataFrame, actual: list[int]) -> None:
     actual_str = "  ".join(f"{n:2d}" for n in sorted(actual))
-    print(f"\n  Actual draw:  [ {actual_str} ]  bonus={bonus}")
-    print(f"  {'Play':<6} {'Line':<6} {'Predicted':<30} {'Hits':<6} {'Bonus'}")
-    print(f"  {'-'*60}")
+    print(f"\n  Actual draw:  [ {actual_str} ]")
+    print(f"  {'Play':<6} {'Line':<6} {'Predicted':<30} {'Hits'}")
+    print(f"  {'-'*55}")
     for _, r in df.iterrows():
-        bonus_str = "YES" if r["bonus_hit"] else "-"
-        print(f"  {int(r['play']):<6} {int(r['line']):<6} {r['predicted']:<30} {int(r['hits']):<6} {bonus_str}")
+        print(f"  {int(r['play']):<6} {int(r['line']):<6} {r['predicted']:<30} {int(r['hits'])}")
     best = df["hits"].max()
     print(f"\n  Best line: {best} match(es) out of {config.LOTTERY['main_count']}")

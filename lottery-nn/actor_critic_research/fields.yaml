@@ -1,0 +1,133 @@
+topic: Actor-Critic play generation for discrete multi-label combinatorial outputs with small training datasets, applied to lottery number prediction neural networks
+
+fields:
+  # --- Identity ---
+  - name: name
+    description: Full name of the method or technique
+    detail_level: brief
+
+  - name: type
+    description: Category — one of RL Algorithm / Architecture / Technique / Theory
+    detail_level: brief
+
+  - name: year
+    description: Year of key publication or widespread adoption
+    detail_level: brief
+
+  - name: key_paper
+    description: Primary citation — authors, title, venue (e.g. NeurIPS 2022)
+    detail_level: brief
+
+  # --- Technical Approach ---
+  - name: algorithm_description
+    description: How the method works — core mechanism in 3-5 sentences
+    detail_level: moderate
+
+  - name: action_space_handling
+    description: How the method represents and samples from the action space — joint, factored, autoregressive, flow-based, etc.
+    detail_level: moderate
+
+  - name: how_combinatorial_output_is_formed
+    description: Specific mechanism for generating a set of k distinct numbers from {1..N} — post-hoc sampling, autoregressive masking, Gumbel-top-k, pointer network, etc.
+    detail_level: moderate
+
+  - name: sequential_generation_strategy
+    description: Whether numbers are generated jointly (flat multi-hot), autoregressively (one at a time conditioned on previous), or via flow/diffusion process — determines whether inter-number correlations can be modeled
+    detail_level: moderate
+
+  - name: gradient_estimator_type
+    description: For methods that backpropagate through discrete sampling — which estimator is used (REINFORCE/score function, Gumbel-softmax/reparameterization, straight-through, RLOO, VIMCO). Determines variance, bias, and training stability on small datasets.
+    detail_level: moderate
+
+  - name: combinatorial_constraint_enforcement
+    description: How the method enforces that exactly k distinct numbers are selected from {1..N} — rejection sampling, differentiable top-k, pointer networks, autoregressive masking, constrained decoding
+    detail_level: moderate
+
+  # --- Small Dataset Suitability ---
+  - name: sample_efficiency_rating
+    description: Qualitative rating (low/medium/high) with justification — how well the method learns from fewer than 200 training samples
+    detail_level: moderate
+
+  - name: regularization_built_in
+    description: What regularization mechanisms are inherent to the method — entropy bonus, KL penalty, dropout, weight decay, conservative penalty, etc.
+    detail_level: moderate
+
+  - name: known_failure_modes_on_small_data
+    description: Documented failure modes specifically when n < 200 — overfitting, divergence, mode collapse, etc.
+    detail_level: moderate
+
+  - name: data_regime_evidence
+    description: Whether the method has been empirically validated on fewer than 200 training samples — minimum_training_samples_tested, performance_degradation_curve, comparison_baseline. Many papers claim small-data suitability but test on 1000+ examples.
+    detail_level: detailed
+
+  - name: convergence_guarantees_small_n
+    description: Theoretical or empirical evidence on convergence behavior when n < 200 — distinguishes methods with finite-sample bounds from those with only asymptotic guarantees
+    detail_level: moderate
+
+  # --- Reward and Credit Assignment ---
+  - name: reward_distribution_handling
+    description: How the method handles highly skewed, sparse reward — lottery is ~95% zero-hit plays, 4% 1-2 hits, rare 3+ hits. Includes whether distributional returns are supported and minimum draws needed for stable learning.
+    detail_level: moderate
+
+  - name: credit_assignment_granularity
+    description: Level at which reward is assigned — play-level (did the set win?), number-level (which individual numbers hit?), or pattern-level. Semi-bandit feedback enables number-level; coarser credit wastes signal on small datasets.
+    detail_level: moderate
+
+  # --- Diversity ---
+  - name: diversity_mechanism
+    description: How the method generates diverse plays rather than collapsing to a single high-probability set — entropy bonus, temperature, explicit diversity reward, population-based, flow-based sampling
+    detail_level: moderate
+
+  # --- Offline vs Online ---
+  - name: offline_vs_online_rl_compatibility
+    description: Whether the method requires online environment interaction (impractical — one draw per week) or can train purely from a fixed historical dataset. This is the most operationally critical field for lottery application.
+    detail_level: moderate
+
+  # --- Implementation ---
+  - name: complexity
+    description: Implementation difficulty — low / medium / high — relative to existing lottery-nn codebase (PyTorch, ~250K param transformer)
+    detail_level: brief
+
+  - name: key_dependencies
+    description: Required libraries beyond PyTorch — e.g. stable-baselines3, torchio, pyro, nflows, torchrl
+    detail_level: brief
+
+  - name: estimated_lines_of_code
+    description: Rough estimate of new code needed to integrate into lottery-nn (excluding boilerplate)
+    detail_level: brief
+
+  - name: transfer_learning_compatibility
+    description: Whether the method can leverage the existing pretrained SharedLotteryTransformer encoder rather than training from scratch — critical given the 3-lottery shared backbone already trained
+    detail_level: moderate
+
+  # --- Fit for Lottery-NN ---
+  - name: relevance_score
+    description: Integer 1-5 — how directly applicable this method is to the lottery-nn project right now. 5 = implement in Phase 2, 3 = Phase 3 candidate, 1 = interesting but not practical here.
+    detail_level: brief
+
+  - name: specific_application_in_project
+    description: Concrete description of how this method would be used in lottery-nn — what it replaces or augments, which lottery, which phase
+    detail_level: detailed
+
+  - name: integration_point
+    description: Phase 2 (Actor-Critic play generation) / Phase 3 (probabilistic models, DeepAR, N-BEATS) / Backbone (replace SharedLotteryTransformer) / Bandit (extend bandit.py)
+    detail_level: brief
+
+  - name: replaces_or_extends
+    description: Whether this replaces an existing component (e.g. replaces temperature-softmax sampling) or extends it (e.g. adds a Critic head alongside existing Actor)
+    detail_level: brief
+
+  # --- Prior Art ---
+  - name: existing_open_source_implementations
+    description: Known GitHub repos, library integrations, or reference implementations available as of 2025
+    detail_level: moderate
+
+  - name: benchmark_results
+    description: Key empirical results from the literature — what datasets/tasks, what metrics, comparison to baselines
+    detail_level: moderate
+
+  - name: notable_use_cases
+    description: Real-world or research applications of this method that are structurally similar to lottery number prediction (combinatorial output, sparse reward, small data)
+    detail_level: moderate
+
+uncertain: []

@@ -20,14 +20,13 @@ log-specific options
 ---------------------
   --date DATE               draw date, e.g. 2026-03-25  (default: today)
   --numbers N N N N N N N   the 7 drawn numbers
-  --bonus N                 the bonus number
   --no-retrain              score only, skip retraining
 
 Examples
 ---------
   python main.py train
   python main.py predict --plays 5
-  python main.py log --date 2026-03-25 --numbers 7 9 22 24 34 36 37 --bonus 19
+  python main.py log --date 2026-03-25 --numbers 7 9 22 24 34 36 37
   python main.py evaluate
 """
 
@@ -109,10 +108,10 @@ def cmd_log(args):
     date = args.date or datetime.today().strftime("%Y-%m-%d")
 
     # 1. Score last prediction against the actual draw
-    score_last_prediction(args.numbers, args.bonus, draw_date="")
+    score_last_prediction(args.numbers, draw_date="")
 
     # 2. Append the new draw to draws.csv
-    log_draw(date, args.numbers, args.bonus)
+    log_draw(date, args.numbers)
 
     if args.no_retrain:
         return
@@ -161,7 +160,6 @@ def build_parser() -> argparse.ArgumentParser:
     # log command
     parser.add_argument("--date", default="", help="Draw date e.g. 2026-03-25")
     parser.add_argument("--numbers", type=int, nargs=7, metavar="N", help="The 7 drawn numbers")
-    parser.add_argument("--bonus", type=int, help="The bonus number")
     parser.add_argument("--no-retrain", action="store_true", help="Score only, skip retraining")
     return parser
 

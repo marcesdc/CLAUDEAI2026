@@ -19,7 +19,7 @@ import config
 
 
 MAIN_MAX = config.LOTTERY["main_max"]
-BONUS_MAX = config.LOTTERY["bonus_max"]
+BONUS_MAX = config.LOTTERY.get("bonus_max", 0)
 MAIN_COUNT = config.LOTTERY["main_count"]
 SEQ_LEN = config.SEQUENCE_LEN
 

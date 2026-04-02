@@ -1,0 +1,131 @@
+topic: Actor-Critic play generation for discrete multi-label combinatorial outputs with small training datasets, applied to lottery number prediction neural networks
+
+items:
+  # --- RL Algorithms ---
+  - name: REINFORCE for multi-label outputs
+    category: RL Algorithm
+    description: Williams 1992 policy gradient baseline — simplest Actor-Critic entry point for set-valued actions
+
+  - name: PPO for discrete combinatorial actions
+    category: RL Algorithm
+    description: Proximal Policy Optimization adapted for multi-hot/set outputs, stable training on small data
+
+  - name: Soft Actor-Critic discrete
+    category: RL Algorithm
+    description: SAC variant for discrete action spaces, entropy regularization built-in — suits small data
+
+  - name: REINFORCE with leave-one-out baseline
+    category: RL Algorithm
+    description: Multi-sample REINFORCE using mean of k other returns as baseline — outperforms learned-critic Actor-Critic on small datasets (RLOO, Ahmadian et al. 2024)
+
+  - name: GFlowNets for combinatorial generation
+    category: RL Algorithm
+    description: Generative Flow Networks learn a policy sampling sets proportionally to reward — designed for discrete combinatorial objects, stable on small datasets via Trajectory Balance objective (Malkin et al. 2022)
+
+  - name: Offline RL and Conservative Q-Learning
+    category: RL Algorithm
+    description: Train policy entirely from fixed historical dataset without online interaction — the correct RL paradigm for lottery (weekly draw constraint), covers CQL/IQL/TD3+BC
+
+  - name: Model-based RL with learned world model
+    category: RL Algorithm
+    description: DreamerV3-style — train Actor-Critic inside imagined environment from a world model of draw history, solving sample scarcity without extra real draws (Hafner et al. 2023)
+
+  - name: Multi-objective RL for coverage and hit-rate tradeoff
+    category: RL Algorithm
+    description: Balance expected hit count vs diversity across plays — Pareto-conditioned networks, MORL-Baselines (Felten et al. 2023)
+
+  - name: Implicit Q-learning with quantile regression
+    category: RL Algorithm
+    description: Distributional value estimation for skewed reward — handles 95% zero-hit plays and rare 3+ hits that mean Q-value misrepresents (IQL, QR-DQN, Kostrikov 2021)
+
+  - name: MCTS-guided policy improvement for combinatorial outputs
+    category: RL Algorithm
+    description: Monte Carlo Tree Search as planning oracle — policy proposes candidates, MCTS refines via lookahead (EfficientZero V2, Wang et al. 2024)
+
+  # --- Architectures ---
+  - name: Autoregressive policy for sequential number selection
+    category: Architecture
+    description: Sample numbers one at a time conditioned on previous selections — breaks intractable joint over C(50,7)=99M outcomes into 7 sequential softmax steps, models inter-number dependencies
+
+  - name: Pointer Networks and Set Transformers
+    category: Architecture
+    description: Neural architectures designed to output sets or permutations — directly applicable to selecting k numbers from pool of N
+
+  - name: N-BEATS for time series backbone
+    category: Architecture
+    description: Interpretable basis expansion, no RNN required, good on short series — Phase 3 backbone candidate replacing SharedLotteryTransformer
+
+  - name: DeepAR probabilistic forecasting
+    category: Architecture
+    description: Autoregressive probabilistic model designed for short real-world time series — produces full predictive distribution, not point estimates
+
+  - name: Temporal Fusion Transformer
+    category: Architecture
+    description: Attention-based architecture built for multivariate short time series with static covariates — lottery_id embedding maps naturally onto its static covariate mechanism
+
+  - name: Pyro probabilistic programming for lottery
+    category: Architecture
+    description: Probabilistic LSTM head with uncertainty quantification via variational inference — Phase 3 candidate for calibrated prediction intervals
+
+  - name: Diffusion models for discrete combinatorial generation
+    category: Architecture
+    description: Discrete diffusion (D3PM, Discrete Flow Matching 2024, Gat et al.) — generates structured discrete objects by reversing a corruption process, works with very few training examples
+
+  # --- Techniques ---
+  - name: Reward shaping for sparse hit signals
+    category: Technique
+    description: Designing informative reward when wins are rare — lottery hit rates are 0-2/7 in typical play, requiring shaped intermediate rewards
+
+  - name: Reflexion pattern for candidate critique
+    category: Technique
+    description: Self-critique loop — generate play, score against historical patterns, revise — applied to lottery candidate generation (Shinn et al. 2023)
+
+  - name: Data augmentation for small draw datasets
+    category: Technique
+    description: Window jitter, synthetic draw synthesis, mixup for multi-hot vectors — directly addresses the 95-106 draw per lottery data constraint
+
+  - name: Curriculum learning on small datasets
+    category: Technique
+    description: Order training samples by difficulty to improve generalization under data scarcity — applied to draw sequence windows
+
+  - name: Thompson Sampling and deep RL hybrid
+    category: Technique
+    description: Combine Beta posterior (already in bandit.py) with policy gradient — use Thompson weight to gate Actor-Critic updates per lottery
+
+  - name: Contrastive learning for temporal draw representations
+    category: Technique
+    description: TS2Vec/CoST-style pretraining on draw sequences — produces rich encoder representations from ~100 draws to bootstrap Actor-Critic (Yue et al. 2022, Woo et al. 2022)
+
+  - name: Stochastic top-k relaxation and Gumbel-top-k
+    category: Technique
+    description: Differentiable approximation for sampling k items without replacement — the core primitive needed for end-to-end differentiable play generation (Kool et al. 2019, Pervez & Tonolini 2023)
+
+  - name: Population-based training for hyperparameter adaptation
+    category: Technique
+    description: Maintain population of agents with different hyperparameters, exploit best performers — robust on small datasets and maps naturally onto the existing 3-lottery swarm structure (Jaderberg et al. 2017)
+
+  - name: Maximum Entropy RL
+    category: Technique
+    description: Entropy bonus in reward prevents policy collapsing to the same set of numbers every play — directly fixes a known failure mode of the current temperature-softmax generation
+
+  - name: Self-play and quality-diversity for diverse play generation
+    category: Technique
+    description: Multiple Actor heads rewarded for generating diverse plays — MAP-Elites/QD-RL, addresses degenerate generation where all lines converge to the same high-probability numbers (Felten et al. 2023)
+
+  # --- Theory ---
+  - name: Set-valued action spaces in RL
+    category: Theory
+    description: Formal treatment of choosing subsets — combinatorial bandits, top-k selection, action space factorization
+
+  - name: Combinatorial bandits with semi-bandit feedback
+    category: Theory
+    description: k-of-n selection under semi-bandit feedback — observe which individual numbers hit, enabling per-number credit assignment richer than scalar hit count
+
+  - name: PAC-Bayes generalization bounds for small-sample RL
+    category: Theory
+    description: Bounds on policy generalization with scarce training data — provides principled KL penalty regularization, sets expectations for 100-draw regime (Haddouche & Guedj 2022-2023)
+
+execution:
+  batch_size: 4
+  items_per_agent: 1
+  output_dir: ./actor_critic_research/results

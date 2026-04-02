@@ -19,7 +19,7 @@ import pandas as pd
 import config
 
 MAIN_COLS = [f"n{i}" for i in range(1, config.LOTTERY["main_count"] + 1)]  # n1..n7
-REQUIRED_COLS = {"date"} | set(MAIN_COLS) | {"bonus"}
+REQUIRED_COLS = {"date"} | set(MAIN_COLS)
 
 
 # ---------------------------------------------------------------------------
@@ -65,23 +65,21 @@ def generate_synthetic(
 ) -> pd.DataFrame:
     """
     Generate *n_draws* random lottery draws and save to *save_path*.
-    Format: date, n1, n2, n3, n4, n5, n6, n7, bonus
+    Format: date, n1, n2, n3, n4, n5, n6, n7
     """
     rng = random.Random(config.SEED)
     main_max = config.LOTTERY["main_max"]
     main_count = config.LOTTERY["main_count"]
-    bonus_max = config.LOTTERY["bonus_max"]
 
     start = datetime(2000, 1, 1)
     records = []
     date = start
     for _ in range(n_draws):
         main = sorted(rng.sample(range(1, main_max + 1), main_count))
-        bonus = rng.randint(1, bonus_max)
-        records.append([date, *main, bonus])
+        records.append([date, *main])
         date += timedelta(days=3 + rng.randint(0, 1))  # ~2x per week
 
-    cols = ["date"] + MAIN_COLS + ["bonus"]
+    cols = ["date"] + MAIN_COLS
     df = pd.DataFrame(records, columns=cols)
 
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
@@ -119,19 +117,12 @@ def _validate(df: pd.DataFrame) -> None:
     if missing:
         raise ValueError(
             f"Data file is missing columns: {sorted(missing)}\n"
-            f"Expected: date, n1, n2, n3, n4, n5, n6, n7, bonus"
+            f"Expected: date, n1, n2, n3, n4, n5, n6, n7"
         )
 
     # Range checks
     main_max = config.LOTTERY["main_max"]
-    bonus_max = config.LOTTERY["bonus_max"]
     for col in MAIN_COLS:
         bad = df[(df[col] < 1) | (df[col] > main_max)]
         if not bad.empty:
             raise ValueError(f"Column '{col}' has values outside 1-{main_max}: {bad[col].tolist()[:5]}")
-    bad_bonus = df[(df["bonus"] < 1) | (df["bonus"] > bonus_max)]
-    if not bad_bonus.empty:
-        raise ValueError(
-            f"Column 'bonus' has values outside 1-{bonus_max}. "
-            f"Adjust LOTTERY['bonus_max'] in config.py if needed."
-        )

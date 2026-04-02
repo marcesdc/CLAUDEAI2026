@@ -11,11 +11,11 @@ LOTTERY = {
 	"id":          0,      # swarm lottery index (0=LottoMax, 1=649, 2=DailyGrand)
 	"main_count":  7,      # how many numbers to pick
 	"main_max":    50,     # highest main number
-	"bonus_max":   50,     # bonus ball range (1 to bonus_max)
+	"has_bonus":   False,  # LottoMax bonus is drawn by the lottery; players don't select it
 }
 
 # A single "play" (ticket) contains this many lines of 7 numbers.
-LINES_PER_PLAY = 3
+LINES_PER_PLAY = 1
 # ---------------------------------------------------------------------------
 # Data
 # ---------------------------------------------------------------------------

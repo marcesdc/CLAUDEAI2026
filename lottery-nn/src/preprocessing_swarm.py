@@ -29,6 +29,8 @@ LOTTERY_CONFIGS = {
         "main_max":    50,
         "bonus_max":   50,
         "bonus_col":   "bonus",
+        "has_bonus":   False,  # bonus is drawn by the lottery; players don't select it
+        "lines_per":   1,      # one set of 7 numbers per play
         "csv":         "data/draws.csv",
         "checkpoint":  "models/best_swarm.pt",   # shared checkpoint
     },
@@ -39,6 +41,8 @@ LOTTERY_CONFIGS = {
         "main_max":    49,
         "bonus_max":   49,
         "bonus_col":   "bonus",
+        "has_bonus":   False,   # bonus is randomly drawn; client cannot select it
+        "lines_per":   3,
         "csv":         "data/draws_649.csv",
         "checkpoint":  "models/best_swarm.pt",
     },
@@ -49,6 +53,8 @@ LOTTERY_CONFIGS = {
         "main_max":    49,
         "bonus_max":   7,
         "bonus_col":   "grand",
+        "has_bonus":   True,
+        "lines_per":   1,
         "csv":         "data/draws_dailygrand.csv",
         "checkpoint":  "models/best_swarm.pt",
     },
@@ -81,18 +87,23 @@ def build_features(df: pd.DataFrame, cfg: dict, seq_len: int = SEQ_LEN):
     main_count = cfg["main_count"]
     main_max   = cfg["main_max"]
     bonus_max  = cfg["bonus_max"]
+    has_bonus  = cfg.get("has_bonus", True)
 
-    main_cols   = [f"n{i}" for i in range(1, main_count + 1)]
-    main_draws  = df[main_cols].values.astype(int)
-    bonus_draws = df["bonus"].values.astype(int)
+    main_cols  = [f"n{i}" for i in range(1, main_count + 1)]
+    main_draws = df[main_cols].values.astype(int)
 
     N = len(main_draws)
 
     # Input: padded to POOL_MAX so all lotteries share the same feature space
     main_hot_padded = _multi_hot(main_draws, POOL_MAX)     # (N, 50)
     # Targets: natural size (no padding on outputs)
-    y_hot           = _multi_hot(main_draws, main_max)     # (N, main_max)
-    bonus_hot       = _one_hot(bonus_draws,  bonus_max)    # (N, bonus_max)
+    y_hot = _multi_hot(main_draws, main_max)               # (N, main_max)
+
+    if has_bonus:
+        bonus_draws = df["bonus"].values.astype(int)
+        bonus_hot   = _one_hot(bonus_draws, bonus_max)     # (N, bonus_max)
+    else:
+        bonus_hot   = np.zeros((N, bonus_max), dtype=np.float32)  # dummy, not trained
 
     X, y_main, y_bonus = [], [], []
     for i in range(seq_len, N):
