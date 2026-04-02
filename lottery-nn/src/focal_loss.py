@@ -25,7 +25,7 @@ def focal_loss_with_logits(
     logits  : (batch, num_classes) raw model output (before sigmoid)
     targets : (batch, num_classes) binary float targets in {0, 1}
     gamma   : modulating exponent. 0.0 = standard BCE. Default 2.0.
-    alpha   : positive-class weight in [0, 1], or None to skip alpha weighting.
+    alpha   : positive-class weight in (0, 1), or None to skip alpha weighting.
               Default None.
 
     Returns

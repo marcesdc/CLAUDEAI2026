@@ -1,4 +1,5 @@
 """Unit tests for focal_loss_with_logits."""
+import pytest
 import torch
 import torch.nn.functional as F
 
@@ -58,7 +59,6 @@ def test_focal_alpha_scales_loss():
 
 def test_negative_gamma_raises():
     """gamma < 0 must raise ValueError."""
-    import pytest
     logits  = torch.randn(4, 50)
     targets = torch.zeros(4, 50)
     with pytest.raises(ValueError, match="gamma"):
@@ -67,7 +67,6 @@ def test_negative_gamma_raises():
 
 def test_alpha_out_of_range_raises():
     """alpha outside (0, 1) must raise ValueError."""
-    import pytest
     logits  = torch.randn(4, 50)
     targets = torch.zeros(4, 50)
     with pytest.raises(ValueError, match="alpha"):
