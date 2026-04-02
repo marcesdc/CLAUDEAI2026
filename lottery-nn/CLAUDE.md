@@ -189,3 +189,59 @@ Lessons from real usage — updated whenever something breaks, causes confusion,
 - **draws_649.csv data loss incident**: A cleaning script with a date regex wiped all rows (wrote header only). No git backup existed. Fix: always assert `len(df) == expected_rows` before writing any cleaned CSV.
 - **Swarm PyTorch UserWarning on nested tensors**: `enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True`. Non-fatal — expected when using Pre-LN (`norm_first=True`). Ignore it.
 - **Daily Grand bonus column is named `grand` in CSV**, not `bonus`. `load_lottery_df()` renames it internally. Do not change the CSV header.
+
+## QA Agents
+
+Three Claude Code sub-agents provide automated quality assurance. All agents live at `.claude/agents/`.
+
+### How to invoke
+
+From any Claude Code session, invoke the lead agent:
+```
+@q_a_lead I just changed <brief description of what changed>
+```
+
+Examples:
+```
+@q_a_lead I refactored feedback.py to call _normalize_columns before concat
+@q_a_lead I added a new RLOO training strategy in src/train.py
+@q_a_lead I updated LOTTERY_CONFIGS to change lines_per for dailygrand
+```
+
+The lead agent launches `q_a1` and `q_a2` in parallel and returns a final GREEN/RED verdict.
+
+### When to invoke
+- After every code change to any `src/` module
+- After every new training strategy (RLOO, MaxEnt, data augmentation, actor-critic, etc.)
+- Before backtesting a new strategy against historical data
+- After manually editing `config.py`
+
+### Agent responsibilities
+
+| Agent | Role |
+|---|---|
+| q_a_lead | Orchestrator. Launches q_a1 and q_a2, synthesizes GREEN/RED verdict |
+| q_a1 | Code review (syntax, config keys, ASCII compliance) + pytest unit + integration tests |
+| q_a2 | cProfile benchmarks, edge-case error handling, docstring coverage, refactoring proposals |
+
+### Running tests manually
+
+```bash
+# All tests
+C:\Python314\python.exe -m pytest tests/ -v --tb=short --no-header -p no:warnings
+
+# Unit tests only (fast)
+C:\Python314\python.exe -m pytest tests/unit/ -v --tb=short
+
+# Integration tests
+C:\Python314\python.exe -m pytest tests/integration/ -v --tb=short
+
+# With coverage
+C:\Python314\python.exe -m pytest tests/ --cov=src --cov-report=term-missing
+```
+
+### Test design constraints
+- Tests never require live draw data -- all use synthetic fixtures from `tests/conftest.py`
+- Tests run entirely on CPU (no CUDA dependency)
+- All test output is ASCII-only
+- `C:\Python314\python.exe` is the only valid Python executable for running pytest

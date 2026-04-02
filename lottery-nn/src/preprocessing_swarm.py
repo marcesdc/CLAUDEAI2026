@@ -42,7 +42,7 @@ LOTTERY_CONFIGS = {
         "bonus_max":   49,
         "bonus_col":   "bonus",
         "has_bonus":   False,   # bonus is randomly drawn; client cannot select it
-        "lines_per":   3,
+        "lines_per":   1,
         "csv":         "data/draws_649.csv",
         "checkpoint":  "models/best_swarm.pt",
     },

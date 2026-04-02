@@ -131,6 +131,9 @@ def cmd_joint_train(args):
 
 
 def cmd_predict(args):
+    from src.qa_gate import run_qa_gate
+    run_qa_gate()
+
     lottery = args.lottery
     if lottery not in LOTTERY_CONFIGS:
         print(f"[swarm] Unknown lottery '{lottery}'. Choose: {list(LOTTERY_CONFIGS)}")

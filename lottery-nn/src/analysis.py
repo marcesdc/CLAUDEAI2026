@@ -18,7 +18,7 @@ import pandas as pd
 import config
 
 MAIN_MAX = config.LOTTERY["main_max"]
-BONUS_MAX = config.LOTTERY["bonus_max"]
+BONUS_MAX = config.LOTTERY.get("bonus_max", 0)
 
 
 def frequency_table(df: pd.DataFrame) -> pd.DataFrame:

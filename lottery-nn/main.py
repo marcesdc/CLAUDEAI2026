@@ -66,6 +66,9 @@ def cmd_train(args):
 
 
 def cmd_predict(args):
+    from src.qa_gate import run_qa_gate
+    run_qa_gate()
+
     from src.predict import load_model, predict, print_plays
 
     df = load_draws()

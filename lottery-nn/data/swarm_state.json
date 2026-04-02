@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "last_updated": "2026-03-27",
-  "joint_train_count": 3,
-  "joint_val_loss": 1.428466,
+  "last_updated": "2026-04-02",
+  "joint_train_count": 5,
+  "joint_val_loss": 0.584044,
   "agent_weights": {
     "lottomax": {
       "alpha": 4.0,
@@ -17,10 +17,10 @@
       "draws_scored": 0
     },
     "dailygrand": {
-      "alpha": 1.0,
-      "beta": 1.0,
-      "weight": 0.5,
-      "draws_scored": 0
+      "alpha": 3.0,
+      "beta": 4.0,
+      "weight": 0.5110877664801522,
+      "draws_scored": 1
     }
   },
   "last_scores": {
@@ -33,8 +33,8 @@
       "date": null
     },
     "dailygrand": {
-      "hits": null,
-      "date": null
+      "hits": 2,
+      "date": "2026-03-30"
     }
   }
 }
