@@ -36,6 +36,7 @@ Examples
 """
 
 import argparse
+import config
 import json
 import os
 import sys
@@ -64,6 +65,7 @@ from src.preprocessing_swarm import (
     get_last_window,
     split,
 )
+from src.focal_loss import focal_loss_with_logits
 
 SWARM_CHECKPOINT  = "models/best_swarm.pt"
 SWARM_STATE_FILE  = "data/swarm_state.json"
@@ -271,7 +273,6 @@ def _make_loaders(splits: dict, split_name: str, batch_size: int, shuffle: bool)
 def _run_joint_epoch(model, loaders: dict, optimizer, train: bool) -> float:
     """One epoch iterating through all lottery loaders in round-robin."""
     model.train(train)
-    main_crit  = nn.BCEWithLogitsLoss()
     bonus_crit = nn.CrossEntropyLoss()
 
     total_loss = 0.0
@@ -298,7 +299,11 @@ def _run_joint_epoch(model, loaders: dict, optimizer, train: bool) -> float:
 
                 main_logits, bonus_logits = model(x, lottery_id=lid)
 
-                loss = main_crit(main_logits, y_main)
+                loss = focal_loss_with_logits(
+                    main_logits, y_main,
+                    gamma=config.FOCAL_GAMMA,
+                    alpha=config.FOCAL_ALPHA,
+                )
                 if LOTTERY_CONFIGS[name].get("has_bonus", True):
                     bonus_target = y_bonus.argmax(dim=1)
                     loss = loss + 0.3 * bonus_crit(bonus_logits, bonus_target)
