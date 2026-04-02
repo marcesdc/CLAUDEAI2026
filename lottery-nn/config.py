@@ -55,8 +55,8 @@ SEED = 42
 # ---------------------------------------------------------------------------
 # Loss
 # ---------------------------------------------------------------------------
-FOCAL_GAMMA = 2.0   # focal loss modulating exponent; 0 = standard BCE
-FOCAL_ALPHA = 0.25  # positive-class weight; None = no alpha weighting
+FOCAL_GAMMA = 2.0   # focal loss modulating exponent; 0 = standard BCE; must be >= 0
+FOCAL_ALPHA = 0.25  # positive-class weight in (0, 1); set to None to disable alpha weighting
 
 # ---------------------------------------------------------------------------
 # Prediction

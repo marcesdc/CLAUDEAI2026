@@ -32,6 +32,11 @@ def focal_loss_with_logits(
     -------
     Scalar mean loss over the batch and all classes.
     """
+    if gamma < 0:
+        raise ValueError(f"gamma must be >= 0, got {gamma}")
+    if alpha is not None and not (0.0 < alpha < 1.0):
+        raise ValueError(f"alpha must be in (0, 1) or None, got {alpha}")
+
     # Numerically stable per-element BCE (same as BCEWithLogitsLoss reduction='none')
     bce = F.binary_cross_entropy_with_logits(logits, targets, reduction="none")
 

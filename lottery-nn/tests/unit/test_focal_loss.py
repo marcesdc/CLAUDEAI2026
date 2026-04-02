@@ -54,3 +54,23 @@ def test_focal_alpha_scales_loss():
     assert abs(loss_no_alpha.item() - loss_with_alpha.item()) > 1e-6, (
         "Expected alpha to change the loss value"
     )
+
+
+def test_negative_gamma_raises():
+    """gamma < 0 must raise ValueError."""
+    import pytest
+    logits  = torch.randn(4, 50)
+    targets = torch.zeros(4, 50)
+    with pytest.raises(ValueError, match="gamma"):
+        focal_loss_with_logits(logits, targets, gamma=-1.0)
+
+
+def test_alpha_out_of_range_raises():
+    """alpha outside (0, 1) must raise ValueError."""
+    import pytest
+    logits  = torch.randn(4, 50)
+    targets = torch.zeros(4, 50)
+    with pytest.raises(ValueError, match="alpha"):
+        focal_loss_with_logits(logits, targets, alpha=1.5)
+    with pytest.raises(ValueError, match="alpha"):
+        focal_loss_with_logits(logits, targets, alpha=0.0)
