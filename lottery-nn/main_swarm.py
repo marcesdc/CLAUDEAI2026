@@ -1,5 +1,5 @@
 """
-Swarm entry point — joint training and per-lottery prediction.
+Swarm entry point -- joint training and per-lottery prediction.
 
 Commands
 --------
@@ -17,25 +17,32 @@ Commands
       (LottoMax logging uses the original main.py)
 
   python main_swarm.py status
-      Show swarm_state.json — last scores, training count, agent weights.
+      Show swarm_state.json -- last scores, training count, agent weights.
 
 Options
 -------
-  --epochs N        override training epochs  (default: 100)
-  --patience N      early-stopping patience   (default: 15)
-  --lr FLOAT        learning rate             (default: 1e-3)
-  --plays N         number of plays to generate (predict only, default: 5)
-  --temperature T   sampling temperature      (predict only, default: 1.2)
+  --epochs N           override training epochs      (default: 100)
+  --patience N         early-stopping patience       (default: 15)
+  --lr FLOAT           learning rate                 (default: 1e-3)
+  --prune              apply LTH magnitude pruning after initial training
+  --prune-percent F    fraction of weights to prune  (default: 0.65)
+  --prune-epochs N     fine-tune epochs after pruning(default: 50)
+  --prune-patience N   early-stopping for fine-tune  (default: 10)
+  --plays N            number of plays to generate   (predict only, default: 1)
+  --temperature T      sampling temperature          (predict only, default: 1.2)
 
 Examples
 --------
   python main_swarm.py joint-train
-  python main_swarm.py predict --lottery 649 --plays 5
+  python main_swarm.py joint-train --prune
+  python main_swarm.py joint-train --prune --prune-percent 0.7
+  python main_swarm.py predict --lottery 649
   python main_swarm.py log --lottery dailygrand --date 2026-03-23 --numbers 8 17 28 37 46 --bonus 7
   python main_swarm.py status
 """
 
 import argparse
+import copy
 import config
 import json
 import os
@@ -66,6 +73,8 @@ from src.preprocessing_swarm import (
     split,
 )
 from src.focal_loss import focal_loss_with_logits
+from src.pruning import apply_masks
+from src.utils import temperature_softmax
 
 SWARM_CHECKPOINT  = "models/best_swarm.pt"
 SWARM_STATE_FILE  = "data/swarm_state.json"
@@ -93,6 +102,9 @@ def cmd_joint_train(args):
 
     model = SharedLotteryTransformer().to(DEVICE)
     print(f"[swarm] SharedLotteryTransformer  params={count_params(model):,}  device={DEVICE}")
+
+    # Snapshot weights before any training for LTH-style reset after pruning
+    init_state = copy.deepcopy(model.state_dict()) if args.prune else None
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
@@ -128,6 +140,12 @@ def cmd_joint_train(args):
                 break
 
     print(f"[swarm] Joint training complete. Best val_loss={best_val:.4f}")
+
+    if args.prune:
+        best_val = _prune_and_finetune(
+            model, init_state, train_loaders, val_loaders, args, history, best_val
+        )
+
     _update_swarm_state(joint_val_loss=best_val)
     _plot_training(history)
 
@@ -147,7 +165,7 @@ def cmd_predict(args):
 
     cfg = LOTTERY_CONFIGS[lottery]
     model = SharedLotteryTransformer().to(DEVICE)
-    model.load_state_dict(torch.load(SWARM_CHECKPOINT, map_location=DEVICE))
+    model.load_state_dict(torch.load(SWARM_CHECKPOINT, map_location=DEVICE, weights_only=True))
     model.eval()
 
     # Adjust temperature using Thompson weight: low confidence -> more exploration
@@ -190,7 +208,7 @@ def cmd_log(args):
         sys.exit(1)
 
     main_max  = cfg["main_max"]
-    has_bonus = cfg.get("has_bonus", True)
+    has_bonus = cfg.get("has_bonus", False)
     for n in args.numbers:
         if not (1 <= n <= main_max):
             print(f"[swarm] Number {n} is outside 1-{main_max}.")
@@ -202,7 +220,7 @@ def cmd_log(args):
             sys.exit(1)
 
     if has_bonus:
-        bonus_col = cfg["bonus_col"]
+        bonus_col = cfg.get("bonus_col", "bonus")
         row_cols  = ["date"] + [f"n{i}" for i in range(1, main_count + 1)] + [bonus_col]
         row_vals  = [date] + sorted(args.numbers) + [args.bonus]
     else:
@@ -252,6 +270,79 @@ def cmd_status(_args):
 
 
 # ---------------------------------------------------------------------------
+# Pruning phase (Lottery Ticket Hypothesis)
+# ---------------------------------------------------------------------------
+
+def _prune_and_finetune(model, init_state, train_loaders, val_loaders, args, history, pretrain_best_val=float("inf")):
+    """
+    Post-training LTH pruning pass:
+      1. Load best checkpoint.
+      2. Prune bottom prune_percent of weights by global magnitude.
+      3. Reset remaining weights to their original init values.
+      4. Fine-tune the sparse subnetwork; overwrite checkpoint only if improved over pretrain_best_val.
+
+    Returns the best val_loss seen (pretrain_best_val if no improvement).
+    """
+    from src.pruning import prune_by_percent, reset_to_init, sparsity
+
+    print(f"\n[prune] Loading best checkpoint for pruning ...")
+    if not Path(SWARM_CHECKPOINT).exists():
+        print("[prune] No checkpoint found -- skipping prune phase.")
+        return pretrain_best_val
+    model.load_state_dict(torch.load(SWARM_CHECKPOINT, map_location=DEVICE, weights_only=True))
+
+    print(f"[prune] Applying {args.prune_percent * 100:.0f}% magnitude pruning ...")
+    masks = prune_by_percent(model, args.prune_percent)
+
+    print("[prune] Resetting to initialization values (winning ticket) ...")
+    reset_to_init(model, init_state, masks)
+    model.to(DEVICE)
+
+    print(f"[prune] Sparsity: {sparsity(model) * 100:.1f}%")
+    print(f"[prune] Fine-tuning for up to {args.prune_epochs} epochs ...")
+
+    # Use a lower LR for fine-tuning (10x reduction is standard LTH practice)
+    optimizer = torch.optim.AdamW(
+        model.parameters(), lr=args.lr * 0.1, weight_decay=1e-4
+    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, T_max=args.prune_epochs
+    )
+
+    best_val   = pretrain_best_val
+    patience_c = 0
+
+    for epoch in range(1, args.prune_epochs + 1):
+        t0       = time.time()
+        tr_loss  = _run_joint_epoch(model, train_loaders, optimizer, train=True, masks=masks)
+        val_loss = _run_joint_epoch(model, val_loaders, optimizer=None, train=False)
+        scheduler.step()
+
+        history["train_loss"].append(tr_loss)
+        history["val_loss"].append(val_loss)
+
+        print(
+            f"[prune] Epoch {epoch:03d}/{args.prune_epochs}  "
+            f"train={tr_loss:.4f}  val={val_loss:.4f}  "
+            f"lr={scheduler.get_last_lr()[0]:.2e}  {time.time() - t0:.1f}s"
+        )
+
+        if val_loss < best_val:
+            best_val   = val_loss
+            patience_c = 0
+            torch.save(model.state_dict(), SWARM_CHECKPOINT)
+            print(f"  [saved] {SWARM_CHECKPOINT}  (val={best_val:.4f})")
+        else:
+            patience_c += 1
+            if patience_c >= args.prune_patience:
+                print(f"[prune] Early stopping at epoch {epoch}.")
+                break
+
+    print(f"[prune] Fine-tuning complete. Best val_loss={best_val:.4f}")
+    return best_val
+
+
+# ---------------------------------------------------------------------------
 # Training internals
 # ---------------------------------------------------------------------------
 
@@ -270,7 +361,7 @@ def _make_loaders(splits: dict, split_name: str, batch_size: int, shuffle: bool)
     return loaders
 
 
-def _run_joint_epoch(model, loaders: dict, optimizer, train: bool) -> float:
+def _run_joint_epoch(model, loaders: dict, optimizer, train: bool, masks=None) -> float:
     """One epoch iterating through all lottery loaders in round-robin."""
     model.train(train)
     bonus_crit = nn.CrossEntropyLoss()
@@ -304,7 +395,7 @@ def _run_joint_epoch(model, loaders: dict, optimizer, train: bool) -> float:
                     gamma=config.FOCAL_GAMMA,
                     alpha=config.FOCAL_ALPHA,
                 )
-                if LOTTERY_CONFIGS[name].get("has_bonus", True):
+                if LOTTERY_CONFIGS[name].get("has_bonus", False):
                     bonus_target = y_bonus.argmax(dim=1)
                     loss = loss + 0.3 * bonus_crit(bonus_logits, bonus_target)
 
@@ -313,6 +404,8 @@ def _run_joint_epoch(model, loaders: dict, optimizer, train: bool) -> float:
                     loss.backward()
                     nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                     optimizer.step()
+                    if masks is not None:
+                        apply_masks(model, masks)
 
                 total_loss += loss.item() * len(x)
                 total_n    += len(x)
@@ -331,15 +424,14 @@ def _sample_plays(model, window: np.ndarray, cfg: dict, n: int, temperature: flo
     with torch.no_grad():
         main_logits, bonus_logits = model(x, lottery_id=lid)
 
-    main_probs  = _temperature_softmax(main_logits[0].cpu().numpy(),  temperature)
-    bonus_probs = _temperature_softmax(bonus_logits[0].cpu().numpy(), temperature)
+    main_probs  = temperature_softmax(main_logits[0].cpu().numpy(),  temperature)
+    bonus_probs = temperature_softmax(bonus_logits[0].cpu().numpy(), temperature)
 
     main_count = cfg["main_count"]
     main_max   = cfg["main_max"]
-    bonus_max  = cfg["bonus_max"]
-    lines_per  = cfg.get("lines_per", 3)
-
-    has_bonus = cfg.get("has_bonus", True)
+    has_bonus  = cfg.get("has_bonus", False)
+    bonus_max  = cfg["bonus_max"] if has_bonus else None
+    lines_per  = cfg.get("lines_per", 1)
     rng   = np.random.default_rng()
     plays = []
     for _ in range(n):
@@ -353,13 +445,6 @@ def _sample_plays(model, window: np.ndarray, cfg: dict, n: int, temperature: flo
         bonus_num = int(rng.choice(bonus_max, p=bonus_probs[:bonus_max]) + 1) if has_bonus else None
         plays.append({"lines": lines, "bonus": bonus_num})
     return plays
-
-
-def _temperature_softmax(logits: np.ndarray, temperature: float) -> np.ndarray:
-    logits = logits / max(temperature, 1e-6)
-    logits -= logits.max()
-    exp = np.exp(logits)
-    return exp / exp.sum()
 
 
 def _print_plays(plays: list, cfg: dict) -> None:
@@ -435,10 +520,11 @@ def _save_swarm_prediction(lottery: str, plays: list) -> None:
     print(f"[swarm] Predictions saved to '{SWARM_PRED_LOG}'.")
 
 
-def _score_swarm_prediction(lottery: str, actual_numbers: list, main_count: int):
+def _score_swarm_prediction(lottery: str, actual_numbers: list, main_count: int) -> int | None:
     """
     Score the most recent swarm prediction for *lottery* against *actual_numbers*.
     Returns the best (max) hit count across all lines, or None if no prediction exists.
+    None is intentional: callers skip bandit updates when there is nothing to score.
     """
     if not Path(SWARM_PRED_LOG).exists():
         print("[swarm] No swarm prediction log found -- skipping scoring.")
@@ -488,7 +574,7 @@ def _plot_training(history: dict) -> None:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="lottery-nn swarm — joint training and multi-lottery prediction",
+        description="lottery-nn swarm -- joint training and multi-lottery prediction",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
@@ -497,15 +583,23 @@ def _build_parser() -> argparse.ArgumentParser:
 
     # joint-train
     p_train = sub.add_parser("joint-train", help="Train shared encoder on all 3 lotteries")
-    p_train.add_argument("--epochs",     type=int,   default=100)
-    p_train.add_argument("--patience",   type=int,   default=15)
-    p_train.add_argument("--lr",         type=float, default=1e-3)
-    p_train.add_argument("--batch-size", type=int,   default=32, dest="batch_size")
+    p_train.add_argument("--epochs",         type=int,   default=100)
+    p_train.add_argument("--patience",       type=int,   default=15)
+    p_train.add_argument("--lr",             type=float, default=1e-3)
+    p_train.add_argument("--batch-size",     type=int,   default=32,  dest="batch_size")
+    p_train.add_argument("--prune",          action="store_true",
+                         help="Apply LTH magnitude pruning after initial training")
+    p_train.add_argument("--prune-percent",  type=float, default=0.65, dest="prune_percent",
+                         help="Fraction of weights to prune (default: 0.65)")
+    p_train.add_argument("--prune-epochs",   type=int,   default=50,  dest="prune_epochs",
+                         help="Fine-tune epochs after pruning (default: 50)")
+    p_train.add_argument("--prune-patience", type=int,   default=10,  dest="prune_patience",
+                         help="Early-stopping patience for fine-tune (default: 10)")
 
     # predict
     p_pred = sub.add_parser("predict", help="Generate plays for a specific lottery")
     p_pred.add_argument("--lottery",     required=True, choices=list(LOTTERY_CONFIGS))
-    p_pred.add_argument("--plays",       type=int,   default=5)
+    p_pred.add_argument("--plays",       type=int,   default=1)
     p_pred.add_argument("--temperature", type=float, default=1.2)
 
     # log

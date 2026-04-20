@@ -9,7 +9,7 @@ Per-lottery output heads handle different pool and bonus sizes.
 
 Lottery IDs
 -----------
-  0 = Lotto Max    (7 from 50, bonus 1-50)
+  0 = Lotto Max    (7 from 52, bonus 1-52, updated 2026-04-14)
   1 = Lotto 6/49   (6 from 49, bonus 1-49)
   2 = Daily Grand  (5 from 49, grand  1-7)
 """
@@ -21,14 +21,15 @@ import torch.nn as nn
 # ---------------------------------------------------------------------------
 # Constants shared across all lotteries
 # ---------------------------------------------------------------------------
-POOL_MAX       = 50          # largest pool size (LottoMax uses 1-50)
+POOL_MAX       = 52          # largest pool size (LottoMax uses 1-52 as of 2026-04-14)
 SEQ_LEN        = 10          # draw history window
 INPUT_DIM      = 2 * POOL_MAX   # multi-hot + rolling-freq, padded to POOL_MAX
 NUM_LOTTERIES  = 3
 
 # Per-lottery output head sizes  [LottoMax, 6/49, DailyGrand]
-MAIN_HEAD_SIZES  = [50, 49, 49]
-BONUS_HEAD_SIZES = [50, 49,  7]
+# Must stay in sync with main_max/bonus_max in preprocessing_swarm.LOTTERY_CONFIGS
+MAIN_HEAD_SIZES  = [52, 49, 49]
+BONUS_HEAD_SIZES = [52, 49,  7]
 
 
 # ---------------------------------------------------------------------------

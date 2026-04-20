@@ -1,35 +1,51 @@
-"""Unit tests for src/feedback.py -- stubs filled by q_a1."""
+"""Unit tests for src/feedback.py."""
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import pandas as pd
 import pytest
+import config
 from src.feedback import log_draw, recency_weights
 
 
 def test_log_draw_appends_row(minimal_draws_csv, monkeypatch):
-    pass
+    monkeypatch.setattr(config, "RAW_CSV", minimal_draws_csv)
+    log_draw("2026-02-01", [1, 5, 10, 15, 20, 25, 30])
+    df = pd.read_csv(minimal_draws_csv)
+    assert len(df) == 4
+    assert "2026-02-01" in df["date"].values
 
 
 def test_log_draw_duplicate_skipped(minimal_draws_csv, monkeypatch):
-    pass
+    monkeypatch.setattr(config, "RAW_CSV", minimal_draws_csv)
+    log_draw("2026-01-01", [2, 6, 11, 21, 31, 41, 49])  # date exists
+    df = pd.read_csv(minimal_draws_csv)
+    assert len(df) == 3  # unchanged
 
 
 def test_log_draw_bad_date_raises(minimal_draws_csv, monkeypatch):
-    pass
+    monkeypatch.setattr(config, "RAW_CSV", minimal_draws_csv)
+    with pytest.raises(ValueError, match="not valid"):
+        log_draw("2026-13-01", [1, 5, 10, 15, 20, 25, 30])
 
 
 def test_log_draw_bad_count_raises(minimal_draws_csv, monkeypatch):
-    pass
+    monkeypatch.setattr(config, "RAW_CSV", minimal_draws_csv)
+    with pytest.raises(ValueError, match="Expected"):
+        log_draw("2026-02-01", [1, 5, 10])
 
 
 def test_recency_weights_sum():
-    pass
+    w = recency_weights(20)
+    assert abs(w.sum() - 1.0) < 1e-5
 
 
 def test_recency_weights_length():
-    pass
+    w = recency_weights(30)
+    assert len(w) == 30
 
 
 def test_recency_weights_monotone():
-    pass
+    w = recency_weights(10)
+    assert all(w[i] < w[i + 1] for i in range(len(w) - 1))

@@ -24,7 +24,7 @@ MAIN_COUNT = config.LOTTERY["main_count"]
 SEQ_LEN = config.SEQUENCE_LEN
 
 
-def build_features(df: pd.DataFrame):
+def build_features(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray | None]:
     """
     Convert a DataFrame of draws into (X, y_main, y_bonus) numpy arrays.
     """
@@ -101,23 +101,22 @@ def split(X, y_main, y_bonus=None, val=config.VAL_SPLIT, test=config.TEST_SPLIT)
 # ---------------------------------------------------------------------------
 
 def _multi_hot(arr: np.ndarray, max_val: int) -> np.ndarray:
-    """arr: (N, k)  →  out: (N, max_val)  (0-indexed internally)"""
+    """arr: (N, k)  ->  out: (N, max_val)  (0-indexed internally)"""
     N = len(arr)
     out = np.zeros((N, max_val), dtype=np.float32)
-    for i, row in enumerate(arr):
-        for v in row:
-            if 1 <= v <= max_val:
-                out[i, v - 1] = 1.0
+    valid = (arr >= 1) & (arr <= max_val)
+    rows, cols = np.where(valid)
+    out[rows, arr[rows, cols] - 1] = 1.0
     return out
 
 
 def _one_hot(arr: np.ndarray, max_val: int) -> np.ndarray:
-    """arr: (N,)  →  out: (N, max_val)"""
+    """arr: (N,)  ->  out: (N, max_val)"""
     N = len(arr)
     out = np.zeros((N, max_val), dtype=np.float32)
-    for i, v in enumerate(arr):
-        if 1 <= v <= max_val:
-            out[i, v - 1] = 1.0
+    valid = (arr >= 1) & (arr <= max_val)
+    indices = np.where(valid)[0]
+    out[indices, arr[indices] - 1] = 1.0
     return out
 
 

@@ -126,3 +126,9 @@ def _validate(df: pd.DataFrame) -> None:
         bad = df[(df[col] < 1) | (df[col] > main_max)]
         if not bad.empty:
             raise ValueError(f"Column '{col}' has values outside 1-{main_max}: {bad[col].tolist()[:5]}")
+
+    # Duplicate date check
+    dupes = df[df.duplicated(subset=["date"], keep=False)]
+    if not dupes.empty:
+        sample = dupes["date"].unique().tolist()[:3]
+        print(f"[data_loader] Warning: {len(dupes)} rows with duplicate dates (e.g. {sample})")

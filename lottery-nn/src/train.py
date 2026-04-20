@@ -94,7 +94,7 @@ def train(
                 print(f"[train] Early stopping at epoch {epoch}.")
                 break
 
-    model.load_state_dict(torch.load(checkpoint, map_location=DEVICE))
+    model.load_state_dict(torch.load(checkpoint, map_location=DEVICE, weights_only=True))
     print(f"[train] Best val_loss={best_val_loss:.4f}")
     return model, history
 
@@ -103,7 +103,25 @@ def train(
 # Internals
 # ---------------------------------------------------------------------------
 
-def _make_loader(X, y_main, y_bonus, shuffle: bool, weights: np.ndarray = None) -> DataLoader:
+def _make_loader(
+    X: np.ndarray,
+    y_main: np.ndarray,
+    y_bonus: np.ndarray | None,
+    shuffle: bool,
+    weights: np.ndarray | None = None,
+) -> DataLoader:
+    """Create a DataLoader with optional weighted sampling.
+
+    Args:
+        X: Feature array of shape (N, seq_len, features).
+        y_main: Multi-hot main-number targets, shape (N, main_max).
+        y_bonus: One-hot bonus targets, shape (N, bonus_max), or None.
+        shuffle: Whether to shuffle batches (ignored when weights provided).
+        weights: Per-sample weights for WeightedRandomSampler; only used when shuffle=True.
+
+    Returns:
+        Configured DataLoader ready for training or evaluation.
+    """
     from torch.utils.data import WeightedRandomSampler
     tensors = [torch.tensor(X), torch.tensor(y_main)]
     if y_bonus is not None:

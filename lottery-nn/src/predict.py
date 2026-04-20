@@ -4,7 +4,7 @@ Inference: generate lottery play suggestions from a trained model.
 A "play" (ticket) contains LINES_PER_PLAY independent selections of
 MAIN_COUNT numbers each, plus one bonus number suggestion.
 
-The model outputs a probability distribution over all 50 numbers.
+The model outputs a probability distribution over all MAIN_MAX numbers.
 Temperature scaling controls diversity across lines within a play.
 """
 
@@ -13,19 +13,22 @@ import torch
 
 import config
 from src.model import build_model
+from src.utils import temperature_softmax
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 MAIN_MAX = config.LOTTERY["main_max"]
 MAIN_COUNT = config.LOTTERY["main_count"]
-BONUS_MAX = config.LOTTERY["bonus_max"]
+BONUS_MAX = config.LOTTERY.get("bonus_max")
+if config.LOTTERY.get("has_bonus", True):
+    assert BONUS_MAX is not None, "config.LOTTERY must set bonus_max when has_bonus=True"
 LINES_PER_PLAY = config.LINES_PER_PLAY
 
 
 def load_model(checkpoint: str = config.CHECKPOINT, arch: str = "transformer", has_bonus: bool = True):
     model = build_model(arch=arch, has_bonus=has_bonus)
-    model.load_state_dict(torch.load(checkpoint, map_location=DEVICE))
+    model.load_state_dict(torch.load(checkpoint, map_location=DEVICE, weights_only=True))
     model.eval()
     model.to(DEVICE)
     return model
@@ -55,9 +58,9 @@ def predict(
     with torch.no_grad():
         main_logits, bonus_logits = model(x)
 
-    main_probs = _temperature_softmax(main_logits[0].cpu().numpy(), temperature)
+    main_probs = temperature_softmax(main_logits[0].cpu().numpy(), temperature)
     bonus_probs = (
-        _temperature_softmax(bonus_logits[0].cpu().numpy(), temperature)
+        temperature_softmax(bonus_logits[0].cpu().numpy(), temperature)
         if bonus_logits is not None
         else None
     )
@@ -108,12 +111,3 @@ def print_plays(plays: list[dict]) -> None:
     print(f"{'=' * width}\n")
 
 
-# ---------------------------------------------------------------------------
-# Internals
-# ---------------------------------------------------------------------------
-
-def _temperature_softmax(logits: np.ndarray, temperature: float) -> np.ndarray:
-    logits = logits / max(temperature, 1e-6)
-    logits -= logits.max()   # numerical stability
-    exp = np.exp(logits)
-    return exp / exp.sum()

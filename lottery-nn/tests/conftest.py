@@ -22,7 +22,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # ---------------------------------------------------------------------------
 
 _LOTTERY_PARAMS = {
-    "lottomax":   {"main_count": 7, "main_max": 50, "bonus_max": 50, "bonus_col": "bonus"},
+    "lottomax":   {"main_count": 7, "main_max": 52, "bonus_max": 52, "bonus_col": "bonus"},
     "649":        {"main_count": 6, "main_max": 49, "bonus_max": 49, "bonus_col": "bonus"},
     "dailygrand": {"main_count": 5, "main_max": 49, "bonus_max": 7,  "bonus_col": "grand"},
 }
@@ -51,7 +51,7 @@ def _make_draws(main_count, main_max, bonus_col, bonus_max, n=50, seed=42):
 
 @pytest.fixture
 def df_lottomax():
-    """Synthetic LottoMax draws: 7 from 50, bonus 1-50, 50 rows."""
+    """Synthetic LottoMax draws: 7 from 52, bonus 1-52, 50 rows."""
     p = _LOTTERY_PARAMS["lottomax"]
     return _make_draws(p["main_count"], p["main_max"], p["bonus_col"], p["bonus_max"])
 
@@ -143,13 +143,13 @@ def swarm_features_all(df_lottomax, df_649, df_dailygrand):
 
 @pytest.fixture
 def dummy_swarm_batch():
-    """Tensor (4, 10, 100) float32 on CPU for SharedLotteryTransformer tests."""
+    """Tensor (4, 10, 104) float32 on CPU for SharedLotteryTransformer tests (INPUT_DIM=2*52)."""
     import torch
-    return torch.zeros(4, 10, 100, dtype=torch.float32)
+    return torch.zeros(4, 10, 104, dtype=torch.float32)
 
 
 @pytest.fixture
 def dummy_main_batch():
-    """Tensor (4, 10, 100) float32 on CPU for single-lottery model tests (2*MAIN_MAX=100)."""
+    """Tensor (4, 10, 104) float32 on CPU for single-lottery model tests (2*MAIN_MAX=2*52=104)."""
     import torch
-    return torch.zeros(4, 10, 100, dtype=torch.float32)
+    return torch.zeros(4, 10, 104, dtype=torch.float32)

@@ -1,252 +1,81 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+PyTorch swarm predictor for OLG Lotto Max + 6/49 + Daily Grand. Python 3.14 setup is in global rules.
 
 ## Commands
 
-Use `C:\Python314\python.exe` (Python 3.14 — the environment where `torch` is installed). `python` on PATH resolves to 3.12 which lacks the dependencies.
-
 ```bash
-# Install dependencies
-pip install -r requirements.txt          # pip is already Python 3.14's pip
+pip install -r requirements.txt
 
-# Generate synthetic data (when no real CSV is available)
-C:\Python314\python.exe main.py data
+# Single-lottery (LottoMax) -- main.py
+C:\Python314\python.exe main.py {data|train|predict|evaluate}
+C:\Python314\python.exe main.py log --date YYYY-MM-DD --numbers n1 .. n7 [--no-retrain]
 
-# Train the model
-C:\Python314\python.exe main.py train
-C:\Python314\python.exe main.py train --arch lstm --epochs 50
-
-# Generate play suggestions (requires a trained checkpoint)
-C:\Python314\python.exe main.py predict --plays 10
-
-# Log actual draw result, score last prediction, and retrain
-C:\Python314\python.exe main.py log --date 2026-03-25 --numbers 3 6 12 21 28 35 41 --bonus 47
-
-# Score only, skip retraining
-C:\Python314\python.exe main.py log --date 2026-03-25 --numbers 3 6 12 21 28 35 41 --bonus 47 --no-retrain
-
-# Evaluate on the test split
-C:\Python314\python.exe main.py evaluate
-```
-
-All commands accept `--arch transformer|lstm` and `--checkpoint PATH`.
-
-**Normal routine after each draw:**
-```
-log → predict
-```
-Only run `train` separately when adding a large batch of historical data at once.
-
-## Architecture
-
-**Entry point**: `main.py` — dispatches `train / predict / evaluate / data` subcommands.
-
-**Data flow**:
-```
-data/draws.csv
-  → src/data_loader.py   (load or generate synthetic draws)
-  → src/preprocessing.py (sliding-window multi-hot features + rolling frequency)
-  → src/train.py         (training loop, early stopping, checkpoint)
-  → src/predict.py       (temperature-sampled ticket generation)
-  → src/evaluate.py      (hit-rate metrics, training curve & frequency plots)
-```
-
-**Models** (`src/model.py`):
-- `LotteryTransformer` — transformer encoder with attention pooling, two heads (main + bonus). Default architecture.
-- `LotteryLSTM` — bidirectional LSTM baseline for comparison.
-- Both share the same `(main_logits, bonus_logits)` forward signature.
-
-**Feature representation** (`src/preprocessing.py`):
-- Each draw is encoded as a multi-hot vector of length `MAIN_MAX`.
-- A rolling-frequency vector (mean over the window) is concatenated, so each time-step has dimension `2 * MAIN_MAX`.
-- Sequences of length `SEQUENCE_LEN` (default 20) form each sample.
-
-**Loss**: `BCEWithLogitsLoss` for main numbers (multi-label), `CrossEntropyLoss` for bonus (weighted 0.3×).
-
-## Configuration
-
-All hyperparameters live in `config.py`. Key settings:
-
-| Variable | Default | Purpose |
-|---|---|---|
-| `LOTTERY` | 7 from 50 + bonus | Ball counts and pool sizes |
-| `LINES_PER_PLAY` | 3 | Lines per play (ticket) |
-| `SEQUENCE_LEN` | 20 | History window fed to the model |
-| `EPOCHS` / `PATIENCE` | 100 / 15 | Training schedule |
-| `TEMPERATURE` | 1.2 | Prediction sampling diversity |
-| `NUM_PLAYS` | 5 | Plays generated per predict call |
-
-## Real Data
-
-Place the Excel file at `data/draws.xlsx` (or `data/draws.csv`).  Required columns:
-
-```
-date  n1  n2  n3  n4  n5  n6  n7  bonus
-```
-
-- `n1`–`n7`: main numbers, each 1–50
-- `bonus`: bonus ball (adjust `LOTTERY["bonus_max"]` in `config.py` to match your game's range)
-- `date`: any format pandas can parse
-
-Without this file, synthetic random draws are generated automatically.
-
-A **play** = 3 independent lines of 7 numbers + 1 bonus suggestion.
-
-## Statistical Analysis
-
-`src/analysis.py` provides standalone helpers (`frequency_table`, `hot_cold`, `pair_frequency`, `gap_analysis`) that can be imported in notebooks without running the full pipeline.
-
-## Feedback Loop
-
-`src/feedback.py` manages the draw-by-draw learning cycle:
-- `log_draw()` — appends a new result to `draws.csv` with date validation
-- `save_prediction()` — auto-called by `predict`, saves plays to `data/predictions_log.csv`
-- `score_last_prediction()` — scores the saved prediction against the actual draw
-- `recency_weights()` — exponential weights (decay=0.92) so recent draws count more during retraining
-
-`data/score_log.csv` accumulates hit scores over time for tracking model improvement.
-
-**Known data quirk**: `draws.csv` originally uses `number1`–`number7` column names. `data_loader._normalize_columns()` renames these to `n1`–`n7` on load. New rows logged via `feedback.log_draw()` are written as `n1`–`n7` directly.
-
-## Agent Interface
-
-Three agent modes live in `agent/`, all launched via `agent/run.py`:
-
-```bash
-# Conversational + analysis (natural language)
-C:\Python314\python.exe agent/run.py chat
-
-# Check OLG website for new draw once (uses Playwright MCP)
-C:\Python314\python.exe agent/run.py monitor
-
-# Poll OLG every 6 hours automatically
-C:\Python314\python.exe agent/run.py watch
-```
-
-**chat** — maintains session context across turns; can log draws, generate predictions, and answer analysis questions in plain English. Uses `Bash`, `Read`, `Glob`, `Grep` tools.
-
-**monitor / watch** — uses `@playwright/mcp@latest` (Node.js) to render the OLG JavaScript page and extract the latest Lotto Max draw. Compares draw date with last row in `draws.csv`; auto-logs and retrains if new. OLG page: https://www.olg.ca/en/lottery/winning-numbers-results.html#game-item-lottomax
-
-**Dependencies**: `pip install claude-agent-sdk anyio` + Node.js/npx for Playwright.
-
-## Swarm System (Phase 1 — complete)
-
-Three lotteries share one transformer backbone trained jointly. Entry point: `main_swarm.py`.
-
-**Swarm commands:**
-```bash
-# Joint-train all 3 lotteries (saves models/best_swarm.pt)
-C:\Python314\python.exe main_swarm.py joint-train
-C:\Python314\python.exe main_swarm.py joint-train --epochs 200 --lr 3e-4
-
-# Generate plays for any lottery
-C:\Python314\python.exe main_swarm.py predict --lottery lottomax --plays 5
-C:\Python314\python.exe main_swarm.py predict --lottery 649 --plays 5
-C:\Python314\python.exe main_swarm.py predict --lottery dailygrand --plays 5
-
-# Log a new draw result (6/49 or Daily Grand only — LottoMax still uses main.py log)
-C:\Python314\python.exe main_swarm.py log --lottery 649 --date 2026-03-26 --numbers 3 7 18 24 31 42 --bonus 15
-C:\Python314\python.exe main_swarm.py log --lottery dailygrand --date 2026-03-27 --numbers 8 17 28 37 46 --bonus 4
-
-# Show swarm state (training count, val loss, last hit scores, agent weights)
+# Swarm (all 3 lotteries) -- main_swarm.py
+C:\Python314\python.exe main_swarm.py joint-train [--prune] [--prune-percent 0.65]
+C:\Python314\python.exe main_swarm.py predict --lottery {lottomax|649|dailygrand}
+C:\Python314\python.exe main_swarm.py log --lottery <name> --date YYYY-MM-DD --numbers ... [--bonus N]
 C:\Python314\python.exe main_swarm.py status
 ```
 
-**Normal routine after each draw:**
-- LottoMax: `main.py log` → `main_swarm.py joint-train` → `main_swarm.py predict --lottery lottomax`
-- 6/49 or Daily Grand: `main_swarm.py log` → `main_swarm.py joint-train` → `main_swarm.py predict --lottery 649|dailygrand`
+`--bonus` only applies to Daily Grand (player-picked Grand 1-7). LottoMax/6/49 bonus is machine-drawn and not part of plays.
+**After each real draw:** `log` → optional `joint-train` → `predict`. Full retrain only when adding a batch of historical rows.
 
-**Swarm architecture** (`src/model_swarm.py`, `src/preprocessing_swarm.py`):
-- `SharedLotteryTransformer` — one Pre-LN transformer backbone + 3 per-lottery head pairs (~253K params)
-- All inputs padded to `POOL_MAX=50` (2×50=100 features per timestep); output heads use natural sizes: LottoMax main=50 bonus=50, 6/49 main=49 bonus=49, Daily Grand main=49 bonus=7
-- `lottery_id` embedding (0=LottoMax, 1=6/49, 2=DailyGrand) broadcast-added to every timestep
-- Round-robin joint training: batches alternate across lotteries each epoch
-- Single checkpoint: `models/best_swarm.pt`
-- Swarm state: `data/swarm_state.json` — auto-updated after every `joint-train` and `log`
+## Per-lottery shape (single source of truth: `src/preprocessing_swarm.py::LOTTERY_CONFIGS`)
 
-**Per-lottery configs** (single source of truth in `src/preprocessing_swarm.py::LOTTERY_CONFIGS`):
-- Daily Grand uses column `grand` in CSV (not `bonus`) — `load_lottery_df()` renames it internally
-- Draw data: `data/draws.csv` (LottoMax), `data/draws_649.csv`, `data/draws_dailygrand.csv`
+| Lottery     | main_count | main_max | has_bonus | bonus_col |
+|-------------|------------|----------|-----------|-----------|
+| lottomax    | 7          | 52       | False     | -         |
+| 649         | 6          | 49       | False     | -         |
+| dailygrand  | 5          | 49       | True (1-7)| `grand`   |
 
-**Planned phases:**
-- Phase 2: Actor-Critic play generation, Reflexion logging (`feedback.py`), Thompson sampling bandit for agent weights
-- Phase 3: DeepAR agent, probabilistic LSTM head, N-BEATS, Pyro probabilistic model
+Other knobs in `config.py`: `LINES_PER_PLAY`, `SEQUENCE_LEN`, `EPOCHS`/`PATIENCE`, `TEMPERATURE`, `NUM_PLAYS`, `FOCAL_GAMMA`, `FOCAL_ALPHA`.
 
-## Applied Learning
+## Data
 
-Lessons from real usage — updated whenever something breaks, causes confusion, or a fix proves itself.
+CSVs under `data/` — `date` is any pandas-parseable format:
+- `draws.csv` (LottoMax): `date, n1..n7`
+- `draws_649.csv`: `date, n1..n6`
+- `draws_dailygrand.csv`: `date, n1..n5, grand`
 
-- **Python executable**: `python` on PATH is 3.12 and lacks `torch`. Always use `C:\Python314\python.exe`. `pip` already points to 3.14 so installs go to the right place.
-- **matplotlib not installed by default**: First `train` run failed with `ModuleNotFoundError: No module named 'matplotlib'`. Fixed by running `pip install matplotlib seaborn tqdm`.
-- **Unicode in print() crashes on Windows**: Characters like `→` and `✓` raise `UnicodeEncodeError` on Windows terminals using cp1252 encoding. Use ASCII alternatives (`->`, `[saved]`) in all print statements.
-- **`log` corrupts draws.csv if columns aren't normalized first**: `log_draw()` originally read the CSV without renaming columns, then concatenated a row with `n1`–`n7` keys against a file with `number1`–`number7` headers — producing duplicate columns and a pandas reindex crash. Fix: call `_normalize_columns()` inside `log_draw()` before concat.
-- **Date typos cause silent bad data**: User typed `2026-06-2026` instead of `2026-03-06`. The bad row was written to `draws.csv` before the crash, requiring manual cleanup. Fix: added `datetime.strptime` validation in `log_draw()` to reject malformed dates immediately.
-- **`NUM_SUGGESTIONS` renamed to `NUM_PLAYS`**: When the user edited `config.py` directly, they reverted to `NUM_SUGGESTIONS`. The rest of the code references `config.NUM_PLAYS` — always check config keys match after manual edits.
-- **OLG lottery page requires JavaScript** — plain `WebFetch` returns no numbers. The backend API (`gateway.www.olg.ca`, `gateway.can2.mkodo.io`) requires auth. Solution: Playwright MCP renders the page in a real browser.
-- **`LINES_PER_PLAY` and `"name"` key can go missing from config**: User's manual edit dropped both. Code in `predict.py` and `evaluate.py` depends on them — restore if missing.
-- **GTX 1660 Super arriving ~2026-03-27**: 6GB GDDR6, CUDA 7.5, will be installed headless (3rd PCIe slot, no monitor). After install, verify with `torch.cuda.is_available()`. Device is auto-detected in all train loops.
-- **draws_649.csv data loss incident**: A cleaning script with a date regex wiped all rows (wrote header only). No git backup existed. Fix: always assert `len(df) == expected_rows` before writing any cleaned CSV.
-- **Swarm PyTorch UserWarning on nested tensors**: `enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True`. Non-fatal — expected when using Pre-LN (`norm_first=True`). Ignore it.
-- **Daily Grand bonus column is named `grand` in CSV**, not `bonus`. `load_lottery_df()` renames it internally. Do not change the CSV header.
+`data_loader._normalize_columns()` renames legacy `number1..number7` to `n1..n7` on load. Without these files, `main.py data` generates synthetic draws.
 
-## QA Agents
+`data/swarm_state.json` is auto-updated by every `joint-train` and `log`. `data/predictions_log.csv` + `data/score_log.csv` track predictions and hit scores.
 
-Three Claude Code sub-agents provide automated quality assurance. All agents live at `.claude/agents/`.
+## Architecture (high-level — read `src/model_swarm.py` for details)
 
-### How to invoke
+- `SharedLotteryTransformer` — Pre-LN backbone + 3 per-lottery head pairs (~253K params). Inputs padded to `POOL_MAX=52` (2x52=104 features/timestep). `lottery_id` embedding (0/1/2) added every timestep. Round-robin batches per epoch.
+- Loss: focal loss for main numbers (`src/focal_loss.py`); CrossEntropyLoss × 0.3 for bonus head (Daily Grand only).
+- Single-lottery alternative: `LotteryTransformer` / `LotteryLSTM` in `src/model.py`.
 
-From any Claude Code session, invoke the lead agent:
+## Active gotchas (don't get burned twice)
+
+- **OLG page needs JavaScript** — plain `WebFetch` returns empty; gateway APIs need auth. Use Playwright MCP (`agent/run.py monitor|watch`).
+- **Daily Grand bonus column is `grand`** in the CSV; `load_lottery_df()` renames it internally — do not rename in CSV.
+- **PyTorch nested-tensor warning on swarm train** (`enable_nested_tensor is True, but ... norm_first was True`) — non-fatal Pre-LN noise. Ignore.
+- **Cleaning scripts must `assert len(df) == expected` before writing CSVs** — a regex cleaner once wiped `draws_649.csv` to header-only with no backup.
+- **LottoMax pool is 1-52 (2026 rule change), not 1-50** — `C(52,7) = 133,784,560`. Old hardcoded `50`/`43` are stale.
+
+## Phase status
+
+Phase 2 in progress (focal loss + bandit + QA team done; Actor-Critic + Reflexion + Thompson-sampling agent weights still pending). Check `git log` for current state. Phase 3 (DeepAR / probabilistic LSTM / N-BEATS / Pyro) not started.
+
+## QA Agents — MANDATORY
+
+`.claude/agents/`: `q_a_lead` (orchestrator) → `q_a1` (review + tests) + `q_a2` (perf + edge cases) in parallel, returns GREEN/RED.
+
+Claude must invoke `@q_a_lead` automatically after every code change to `src/`, root scripts, `tests/`, or `config.py`, and before declaring the task done. Do not report complete until q_a_lead returns GREEN.
+
 ```
-@q_a_lead I just changed <brief description of what changed>
-```
-
-Examples:
-```
-@q_a_lead I refactored feedback.py to call _normalize_columns before concat
-@q_a_lead I added a new RLOO training strategy in src/train.py
-@q_a_lead I updated LOTTERY_CONFIGS to change lines_per for dailygrand
+@q_a_lead I just changed <one-line description>
 ```
 
-The lead agent launches `q_a1` and `q_a2` in parallel and returns a final GREEN/RED verdict.
+Manual test runs: `C:\Python314\python.exe -m pytest tests/ -v --tb=short` (also `tests/unit/`, `tests/integration/`, or `--cov=src --cov-report=term-missing`). Tests use synthetic fixtures from `tests/conftest.py` and run on CPU only.
 
-### When to invoke
-
-**MANDATORY** — the QA team MUST run after every session that creates or modifies code.
-No exceptions. Do not consider implementation complete until the QA lead returns GREEN.
-
-- After every code change to any `src/` module or root-level script
-- After creating any new file in `src/` or `tests/`
-- After every new training strategy (RLOO, MaxEnt, data augmentation, actor-critic, etc.)
-- Before backtesting a new strategy against historical data
-- After manually editing `config.py`
-
-### Agent responsibilities
-
-| Agent | Role |
-|---|---|
-| q_a_lead | Orchestrator. Launches q_a1 and q_a2, synthesizes GREEN/RED verdict |
-| q_a1 | Code review (syntax, config keys, ASCII compliance) + pytest unit + integration tests |
-| q_a2 | cProfile benchmarks, edge-case error handling, docstring coverage, refactoring proposals |
-
-### Running tests manually
+## Agent Interface
 
 ```bash
-# All tests
-C:\Python314\python.exe -m pytest tests/ -v --tb=short --no-header -p no:warnings
-
-# Unit tests only (fast)
-C:\Python314\python.exe -m pytest tests/unit/ -v --tb=short
-
-# Integration tests
-C:\Python314\python.exe -m pytest tests/integration/ -v --tb=short
-
-# With coverage
-C:\Python314\python.exe -m pytest tests/ --cov=src --cov-report=term-missing
+C:\Python314\python.exe agent/run.py {chat|monitor|watch}
 ```
 
-### Test design constraints
-- Tests never require live draw data -- all use synthetic fixtures from `tests/conftest.py`
-- Tests run entirely on CPU (no CUDA dependency)
-- All test output is ASCII-only
-- `C:\Python314\python.exe` is the only valid Python executable for running pytest
+`monitor`/`watch` use `@playwright/mcp@latest` to render the OLG JS page and auto-log new draws. Deps: `pip install claude-agent-sdk anyio` + Node/`npx`.

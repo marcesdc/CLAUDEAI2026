@@ -1,8 +1,8 @@
 """
 Multi-lottery feature engineering for the swarm shared encoder.
 
-All lotteries are encoded to the same input dimension (2 * POOL_MAX = 100)
-by padding multi-hot and rolling-frequency vectors to POOL_MAX=50.
+All lotteries are encoded to the same input dimension (2 * POOL_MAX = 104)
+by padding multi-hot and rolling-frequency vectors to POOL_MAX=52.
 
 Target vectors (y_main, y_bonus) retain their natural size per lottery
 so the per-lottery heads learn the right output distribution.
@@ -11,12 +11,7 @@ so the per-lottery heads learn the right output distribution.
 import numpy as np
 import pandas as pd
 
-
-# ---------------------------------------------------------------------------
-# Shared constants
-# ---------------------------------------------------------------------------
-POOL_MAX = 50   # largest pool across all games (LottoMax uses 1-50)
-SEQ_LEN  = 10   # draw history window
+from src.model_swarm import POOL_MAX, SEQ_LEN  # single source of truth for architecture dims
 
 # ---------------------------------------------------------------------------
 # Lottery registry — single source of truth for all per-lottery settings
@@ -26,8 +21,8 @@ LOTTERY_CONFIGS = {
         "id":          0,
         "name":        "Lotto Max",
         "main_count":  7,
-        "main_max":    50,
-        "bonus_max":   50,
+        "main_max":    52,     # updated 2026-04-14: range expanded from 50 to 52
+        "bonus_max":   52,
         "bonus_col":   "bonus",
         "has_bonus":   False,  # bonus is drawn by the lottery; players don't select it
         "lines_per":   1,      # one set of 7 numbers per play
@@ -39,9 +34,9 @@ LOTTERY_CONFIGS = {
         "name":        "Lotto 6/49",
         "main_count":  6,
         "main_max":    49,
-        "bonus_max":   49,
+        "bonus_max":   49,      # model head size only -- not shown to users (has_bonus=False)
+        "has_bonus":   False,   # bonus is randomly drawn by OLG; not available to players
         "bonus_col":   "bonus",
-        "has_bonus":   False,   # bonus is randomly drawn; client cannot select it
         "lines_per":   1,
         "csv":         "data/draws_649.csv",
         "checkpoint":  "models/best_swarm.pt",
@@ -71,8 +66,9 @@ def load_lottery_df(lottery_name: str) -> pd.DataFrame:
     df  = pd.read_csv(cfg["csv"], parse_dates=["date"])
     df  = df.sort_values("date").reset_index(drop=True)
     # Normalise bonus column so all lotteries use "bonus" internally
-    if cfg["bonus_col"] != "bonus" and cfg["bonus_col"] in df.columns:
-        df = df.rename(columns={cfg["bonus_col"]: "bonus"})
+    bonus_col = cfg.get("bonus_col", "bonus")
+    if bonus_col != "bonus" and bonus_col in df.columns:
+        df = df.rename(columns={bonus_col: "bonus"})
     return df
 
 
@@ -80,7 +76,7 @@ def build_features(df: pd.DataFrame, cfg: dict, seq_len: int = SEQ_LEN):
     """
     Build (X, y_main, y_bonus) for one lottery.
 
-    X       : (N', seq_len, 2*POOL_MAX)   -- padded to POOL_MAX=50
+    X       : (N', seq_len, 2*POOL_MAX)   -- padded to POOL_MAX=52 (INPUT_DIM=104)
     y_main  : (N', main_max)              -- natural size for this lottery
     y_bonus : (N', bonus_max)             -- natural size for this lottery
     """
@@ -95,7 +91,7 @@ def build_features(df: pd.DataFrame, cfg: dict, seq_len: int = SEQ_LEN):
     N = len(main_draws)
 
     # Input: padded to POOL_MAX so all lotteries share the same feature space
-    main_hot_padded = _multi_hot(main_draws, POOL_MAX)     # (N, 50)
+    main_hot_padded = _multi_hot(main_draws, POOL_MAX)     # (N, 52)
     # Targets: natural size (no padding on outputs)
     y_hot = _multi_hot(main_draws, main_max)               # (N, main_max)
 
@@ -107,11 +103,11 @@ def build_features(df: pd.DataFrame, cfg: dict, seq_len: int = SEQ_LEN):
 
     X, y_main, y_bonus = [], [], []
     for i in range(seq_len, N):
-        window = main_hot_padded[i - seq_len : i]          # (seq_len, 50)
+        window = main_hot_padded[i - seq_len : i]          # (seq_len, 52)
         freq   = window.mean(axis=0, keepdims=True)
         aug    = np.concatenate(
             [window, np.tile(freq, (seq_len, 1))], axis=-1
-        )                                                   # (seq_len, 100)
+        )                                                   # (seq_len, 104)
         X.append(aug)
         y_main.append(y_hot[i])
         y_bonus.append(bonus_hot[i])

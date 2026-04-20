@@ -25,7 +25,7 @@ log-specific options
 Examples
 ---------
   python main.py train
-  python main.py predict --plays 5
+  python main.py predict
   python main.py log --date 2026-03-25 --numbers 7 9 22 24 34 36 37
   python main.py evaluate
 """
@@ -111,7 +111,7 @@ def cmd_log(args):
     date = args.date or datetime.today().strftime("%Y-%m-%d")
 
     # 1. Score last prediction against the actual draw
-    score_last_prediction(args.numbers, draw_date="")
+    score_last_prediction(args.numbers, draw_date=date)
 
     # 2. Append the new draw to draws.csv
     log_draw(date, args.numbers)
@@ -162,7 +162,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--plays", type=int, default=config.NUM_PLAYS)
     # log command
     parser.add_argument("--date", default="", help="Draw date e.g. 2026-03-25")
-    parser.add_argument("--numbers", type=int, nargs=7, metavar="N", help="The 7 drawn numbers")
+    parser.add_argument("--numbers", type=int, nargs=config.LOTTERY["main_count"], metavar="N", help="The drawn numbers")
     parser.add_argument("--no-retrain", action="store_true", help="Score only, skip retraining")
     return parser
 

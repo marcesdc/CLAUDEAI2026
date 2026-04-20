@@ -10,7 +10,7 @@ LOTTERY = {
 	"name":        "Lotto Max",
 	"id":          0,      # swarm lottery index (0=LottoMax, 1=649, 2=DailyGrand)
 	"main_count":  7,      # how many numbers to pick
-	"main_max":    50,     # highest main number
+	"main_max":    52,     # highest main number (updated 2026-04-14: range expanded from 50 to 52)
 	"has_bonus":   False,  # LottoMax bonus is drawn by the lottery; players don't select it
 }
 
@@ -61,5 +61,5 @@ FOCAL_ALPHA = 0.25  # positive-class weight in (0, 1); set to None to disable al
 # ---------------------------------------------------------------------------
 # Prediction
 # ---------------------------------------------------------------------------
-NUM_PLAYS = 5              # how many plays (tickets) to generate
+NUM_PLAYS = 1              # how many plays (tickets) to generate
 TEMPERATURE = 1.2          # >1 -> more diverse, <1 -> more concentrated
