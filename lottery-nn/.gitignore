@@ -17,3 +17,7 @@ dist/
 build/
 
 .ipynb_checkpoints/
+
+.coverage
+.pytest_cache/
+.playwright-mcp/
