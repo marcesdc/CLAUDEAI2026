@@ -1,0 +1,55 @@
+{
+  "lotteries": {
+    "649": {
+      "last_prediction": {
+        "combination": [
+          32,
+          33,
+          37,
+          38,
+          39,
+          41
+        ],
+        "ev_gross": 0.7494026914991976,
+        "ev_net": -2.2505973085008026,
+        "grand_number": null,
+        "jackpot": 5000000.0,
+        "target_date": "2026-04-17"
+      }
+    },
+    "dailygrand": {
+      "last_prediction": {
+        "combination": [
+          32,
+          33,
+          36,
+          38,
+          39
+        ],
+        "ev_gross": 1.045651969510418,
+        "ev_net": -1.954348030489582,
+        "grand_number": 1,
+        "jackpot": 7000000.0,
+        "target_date": "2026-04-17"
+      }
+    },
+    "lottomax": {
+      "last_prediction": {
+        "combination": [
+          32,
+          33,
+          34,
+          36,
+          38,
+          39,
+          41
+        ],
+        "ev_gross": 0.6817907761217661,
+        "ev_net": -4.318209223878234,
+        "grand_number": null,
+        "jackpot": 30000000.0,
+        "target_date": "2026-04-17"
+      }
+    }
+  }
+}
