@@ -111,7 +111,17 @@ def score_last_prediction(actual_numbers: list[int], draw_date: str = "") -> pd.
     Score the most recently saved prediction against the actual draw.
     Prints a summary and appends results to score_log.csv.
 
-    Returns a DataFrame with per-line hit counts.
+    Parameters
+    ----------
+    actual_numbers : the numbers drawn, as logged by the user.
+    draw_date      : pred_date to score against.
+                     If empty, defaults to the pred_date of the last row in
+                     predictions_log.csv (happy path: predict -> draw -> log).
+                     If non-empty but no saved predictions match, returns an
+                     empty DataFrame (no silent fallback to older pred_dates,
+                     which would attribute stale predictions to a newer draw).
+
+    Returns a DataFrame with per-line hit counts (empty if nothing to score).
     """
     if not Path(PRED_LOG).exists():
         print("[feedback] No prediction log found. Run 'predict' before logging a draw.")
@@ -123,7 +133,14 @@ def score_last_prediction(actual_numbers: list[int], draw_date: str = "") -> pd.
 
     latest = df_pred[df_pred["pred_date"] == draw_date].copy()
     if latest.empty:
-        latest = df_pred[df_pred["pred_date"] == df_pred["pred_date"].max()].copy()
+        # Do NOT silently fall back to an older pred_date: scoring it and
+        # stamping it with this draw_date would corrupt score_log.csv by
+        # attributing an older prediction to a newer draw.
+        print(
+            f"[feedback] No saved prediction for pred_date={draw_date}. "
+            f"Run 'predict' before the draw, or log with --no-retrain only."
+        )
+        return pd.DataFrame()
 
     actual_set = set(actual_numbers)
     rows = []

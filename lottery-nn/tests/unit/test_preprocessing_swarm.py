@@ -58,3 +58,24 @@ def test_load_lottery_df_renames_grand(dailygrand_csv, monkeypatch):
     df = load_lottery_df("dailygrand")
     assert "bonus" in df.columns
     assert "grand" not in df.columns
+
+
+def test_build_features_raises_on_short_history(df_lottomax):
+    """Codex H2 guard: <= seq_len rows must raise before concat-shape mismatch."""
+    cfg = LOTTERY_CONFIGS["lottomax"]
+    short = df_lottomax.head(SEQ_LEN)
+    with pytest.raises(ValueError, match="seq_len"):
+        build_features(short, cfg)
+
+
+def test_get_last_window_raises_on_short_history(lottomax_csv, monkeypatch):
+    """get_last_window must raise cleanly when history < seq_len."""
+    import pandas as pd
+    from src.preprocessing_swarm import get_last_window
+    # Trim the synthetic CSV to fewer rows than seq_len
+    df = pd.read_csv(lottomax_csv).head(max(1, SEQ_LEN - 2))
+    df.to_csv(lottomax_csv, index=False)
+    import src.preprocessing_swarm as ps
+    monkeypatch.setitem(ps.LOTTERY_CONFIGS["lottomax"], "csv", lottomax_csv)
+    with pytest.raises(ValueError, match="get_last_window"):
+        get_last_window("lottomax")

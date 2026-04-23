@@ -108,6 +108,13 @@ def cmd_log(args):
     from src.train import train
     from src.evaluate import plot_training
 
+    if args.numbers is None:
+        sys.exit(
+            f"error: 'log' requires --numbers "
+            f"({config.LOTTERY['main_count']} integers, e.g. "
+            f"--numbers 7 9 22 24 34 36 37)"
+        )
+
     date = args.date or datetime.today().strftime("%Y-%m-%d")
 
     # 1. Score last prediction against the actual draw

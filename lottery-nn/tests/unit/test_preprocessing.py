@@ -43,3 +43,19 @@ def test_decode_onehot_range(df_lottomax):
     vec = np.zeros(config.LOTTERY["main_max"])
     vec[10] = 1.0  # ball 11
     assert decode_onehot(vec) == 11
+
+
+def test_build_features_raises_on_short_history(df_lottomax):
+    """Codex H2 guard: <= SEQUENCE_LEN rows must raise, not return shape (0,)."""
+    short = df_lottomax.head(config.SEQUENCE_LEN).drop(columns=["bonus"])
+    with pytest.raises(ValueError, match="SEQUENCE_LEN"):
+        build_features(short)
+
+
+def test_split_rejects_empty_arrays():
+    """split() on empty arrays must raise, not compute negative n_train."""
+    from src.preprocessing import split
+    empty_x = np.zeros((0, config.SEQUENCE_LEN, 2 * config.LOTTERY["main_max"]), dtype=np.float32)
+    empty_y = np.zeros((0, config.LOTTERY["main_max"]), dtype=np.float32)
+    with pytest.raises(ValueError, match="train/val/test"):
+        split(empty_x, empty_y, None)

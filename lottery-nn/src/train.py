@@ -63,7 +63,9 @@ def train(
 
     best_val_loss = float("inf")
     patience_counter = 0
-    os.makedirs(os.path.dirname(checkpoint), exist_ok=True)
+    ckpt_dir = os.path.dirname(checkpoint)
+    if ckpt_dir:
+        os.makedirs(ckpt_dir, exist_ok=True)
 
     history = {"train_loss": [], "val_loss": []}
 

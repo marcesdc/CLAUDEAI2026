@@ -38,6 +38,17 @@ def test_full_single_lottery_pipeline(tmp_path):
     assert Path(ckpt).exists()
 
 
+def test_train_accepts_bare_filename_checkpoint(tmp_path, monkeypatch):
+    """Codex M2 guard: --checkpoint best.pt (no dir) must not crash
+    on os.makedirs('', exist_ok=True)."""
+    monkeypatch.chdir(tmp_path)
+    df = _make_synthetic_df(n=config.SEQUENCE_LEN + 10, seed=2)
+    X, y_main, y_bonus = build_features(df)
+    train_data, val_data, _ = split(X, y_main, y_bonus)
+    model, _ = train(train_data, val_data, epochs=1, checkpoint="bare.pt")
+    assert (tmp_path / "bare.pt").exists()
+
+
 def test_predict_after_train(tmp_path, monkeypatch):
     from src import feedback
     monkeypatch.setattr(feedback, "PRED_LOG", str(tmp_path / "pred_log.csv"))

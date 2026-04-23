@@ -11,3 +11,4 @@
 - [project_silent_overwrite_fix_2026_04_23.md](project_silent_overwrite_fix_2026_04_23.md) -- Incident 2026-04-23 fix: load_draws() raises FileNotFoundError, SYNTHETIC_CSV constant -- GREEN 109/109, W1/W2/S1-S3 open
 - [project_silent_overwrite_fix_2026_04_23_followup.md](project_silent_overwrite_fix_2026_04_23_followup.md) -- Follow-up 2026-04-23: W1/W2/S1/S2/S3 all closed, GREEN 111/111, S4 deferred (main_swarm.py bootstrap, intentional first-use)
 - [project_cmd_log_bootstrap_final_2026_04_23.md](project_cmd_log_bootstrap_final_2026_04_23.md) -- Final pass 2026-04-23: S4 closed + monitor.py comment, all write-sites audited -- GREEN 112/112, NO open items
+- [project_codex_bugfixes_2026_04_23b.md](project_codex_bugfixes_2026_04_23b.md) -- Codex 5-fix batch 2026-04-23: H2a/H2b short-history guards, H1 silent-fallback, M1 numbers guard, M2 dirname guard -- GREEN 120/120

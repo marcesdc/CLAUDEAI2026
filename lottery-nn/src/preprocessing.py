@@ -27,6 +27,8 @@ SEQ_LEN = config.SEQUENCE_LEN
 def build_features(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray | None]:
     """
     Convert a DataFrame of draws into (X, y_main, y_bonus) numpy arrays.
+
+    Requires len(df) > SEQUENCE_LEN so at least one sliding window can be built.
     """
     main_cols = [c for c in df.columns if c.startswith("n")]
     has_bonus = "bonus" in df.columns
@@ -35,6 +37,11 @@ def build_features(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray
     bonus_draws = df["bonus"].values.astype(int) if has_bonus else None
 
     N = len(main_draws)
+    if N <= SEQ_LEN:
+        raise ValueError(
+            f"[preprocessing] Need more than SEQUENCE_LEN={SEQ_LEN} draws to build "
+            f"features, got {N}. Add more history or lower config.SEQUENCE_LEN."
+        )
 
     # --- multi-hot encoding for each draw ---------------------------------
     main_hot = _multi_hot(main_draws, MAIN_MAX)      # (N, MAIN_MAX)
@@ -71,9 +78,18 @@ def build_features(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray
 def split(X, y_main, y_bonus=None, val=config.VAL_SPLIT, test=config.TEST_SPLIT):
     """Chronological train / val / test split (no shuffling)."""
     N = len(X)
+    if N < 3:
+        raise ValueError(
+            f"[preprocessing] Need >= 3 samples to split into train/val/test, got {N}."
+        )
     n_test = max(1, int(N * test))
     n_val = max(1, int(N * val))
     n_train = N - n_val - n_test
+    if n_train <= 0:
+        raise ValueError(
+            f"[preprocessing] Invalid split: N={N}, val={val}, test={test} "
+            f"yields n_train={n_train}. Reduce val/test fractions or add data."
+        )
 
     slices = {
         "train": slice(0, n_train),

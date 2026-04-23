@@ -6,7 +6,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import pandas as pd
 import pytest
 import config
-from src.feedback import log_draw, recency_weights
+import src.feedback as feedback_mod
+from src.feedback import log_draw, recency_weights, score_last_prediction, save_prediction
 
 
 def test_log_draw_appends_row(minimal_draws_csv, monkeypatch):
@@ -64,3 +65,49 @@ def test_recency_weights_length():
 def test_recency_weights_monotone():
     w = recency_weights(10)
     assert all(w[i] < w[i + 1] for i in range(len(w) - 1))
+
+
+def test_score_last_prediction_no_match_returns_empty(tmp_path, monkeypatch):
+    """Codex H1 guard: if draw_date has no saved prediction, return empty --
+    do NOT fall back to an older prediction and stamp it with draw_date.
+    """
+    pred_log = tmp_path / "predictions_log.csv"
+    score_log = tmp_path / "score_log.csv"
+    monkeypatch.setattr(feedback_mod, "PRED_LOG", str(pred_log))
+    monkeypatch.setattr(feedback_mod, "SCORE_LOG", str(score_log))
+
+    # Saved prediction for 2026-04-01 only
+    save_prediction(
+        plays=[{"lines": [[1, 2, 3, 4, 5, 6, 7]]}],
+        draw_date="2026-04-01",
+    )
+
+    # Caller asks to score for 2026-04-22 (no matching pred rows)
+    result = score_last_prediction(
+        actual_numbers=[1, 2, 3, 4, 5, 6, 7],
+        draw_date="2026-04-22",
+    )
+
+    assert result.empty, "Must return empty DataFrame, not score old prediction"
+    # Score log must NOT be written -- no scoring happened
+    assert not score_log.exists(), "score_log.csv must not be created when no match"
+
+
+def test_score_last_prediction_exact_match_scores(tmp_path, monkeypatch):
+    """Positive case: when draw_date matches a saved pred_date, scoring proceeds."""
+    pred_log = tmp_path / "predictions_log.csv"
+    score_log = tmp_path / "score_log.csv"
+    monkeypatch.setattr(feedback_mod, "PRED_LOG", str(pred_log))
+    monkeypatch.setattr(feedback_mod, "SCORE_LOG", str(score_log))
+
+    save_prediction(
+        plays=[{"lines": [[1, 2, 3, 4, 5, 6, 7]]}],
+        draw_date="2026-04-22",
+    )
+    result = score_last_prediction(
+        actual_numbers=[1, 2, 3, 10, 20, 30, 40],
+        draw_date="2026-04-22",
+    )
+    assert not result.empty
+    assert int(result["hits"].iloc[0]) == 3
+    assert result["draw_date"].iloc[0] == "2026-04-22"

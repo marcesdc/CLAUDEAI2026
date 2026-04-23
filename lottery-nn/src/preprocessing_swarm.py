@@ -89,6 +89,11 @@ def build_features(df: pd.DataFrame, cfg: dict, seq_len: int = SEQ_LEN):
     main_draws = df[main_cols].values.astype(int)
 
     N = len(main_draws)
+    if N <= seq_len:
+        raise ValueError(
+            f"[swarm] Need more than seq_len={seq_len} draws to build features, "
+            f"got {N}. Add more history or lower seq_len."
+        )
 
     # Input: padded to POOL_MAX so all lotteries share the same feature space
     main_hot_padded = _multi_hot(main_draws, POOL_MAX)     # (N, 52)
@@ -158,12 +163,20 @@ def split(X, y_main, y_bonus, val: float = 0.15, test: float = 0.05):
 
 
 def get_last_window(lottery_name: str, seq_len: int = SEQ_LEN) -> np.ndarray:
-    """Return the most recent preprocessed window for inference."""
+    """Return the most recent preprocessed window for inference.
+
+    Requires at least seq_len draws of history.
+    """
     cfg        = LOTTERY_CONFIGS[lottery_name]
     df         = load_lottery_df(lottery_name)
     main_count = cfg["main_count"]
     main_cols  = [f"n{i}" for i in range(1, main_count + 1)]
     main_draws = df[main_cols].values.astype(int)
+    if len(main_draws) < seq_len:
+        raise ValueError(
+            f"[swarm] get_last_window({lottery_name!r}) needs >= {seq_len} draws, "
+            f"found {len(main_draws)}. Log more draws before predicting."
+        )
     main_hot   = _multi_hot(main_draws, POOL_MAX)
     window     = main_hot[-seq_len:]
     freq       = window.mean(axis=0, keepdims=True)
