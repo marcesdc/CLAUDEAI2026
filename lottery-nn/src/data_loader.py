@@ -32,7 +32,10 @@ def load_draws(csv_path: str = config.RAW_CSV) -> pd.DataFrame:
     columns:  date  n1  n2  n3  n4  n5  n6  n7  bonus
     sorted oldest-first.
 
-    If the file does not exist, falls back to :func:`generate_synthetic`.
+    Raises FileNotFoundError if *csv_path* (and Excel siblings) do not exist.
+    Never silently generates synthetic data - that footgun once cost the
+    user a month of real LottoMax history (incident 2026-04-23).
+    To create test data instead, call generate_synthetic() explicitly.
     """
     path = Path(csv_path)
     if not path.exists():
@@ -44,8 +47,12 @@ def load_draws(csv_path: str = config.RAW_CSV) -> pd.DataFrame:
         elif xls.exists():
             path = xls
         else:
-            print(f"[data_loader] '{csv_path}' not found - generating synthetic data.")
-            return generate_synthetic()
+            raise FileNotFoundError(
+                f"[data_loader] '{csv_path}' not found (and no .xlsx/.xls sibling). "
+                f"Refusing to silently regenerate synthetic data over a real-data path. "
+                f"To create test data, call generate_synthetic() explicitly "
+                f"(default save path is 'data/draws_synthetic.csv', NOT this file)."
+            )
 
     if path.suffix.lower() in (".xlsx", ".xls"):
         df = pd.read_excel(path, parse_dates=["date"])
@@ -59,9 +66,13 @@ def load_draws(csv_path: str = config.RAW_CSV) -> pd.DataFrame:
     return df
 
 
+# Synthetic data is written to a dedicated path so it can never overwrite real-data CSVs.
+SYNTHETIC_CSV = "data/draws_synthetic.csv"
+
+
 def generate_synthetic(
     n_draws: int = 2000,
-    save_path: str = config.RAW_CSV,
+    save_path: str = SYNTHETIC_CSV,
 ) -> pd.DataFrame:
     """
     Generate *n_draws* random lottery draws and save to *save_path*.
@@ -82,7 +93,8 @@ def generate_synthetic(
     cols = ["date"] + MAIN_COLS
     df = pd.DataFrame(records, columns=cols)
 
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    parent = os.path.dirname(save_path) or "."
+    os.makedirs(parent, exist_ok=True)
     df.to_csv(save_path, index=False)
     print(f"[data_loader] Saved {n_draws} synthetic draws to '{save_path}'.")
     return df

@@ -128,14 +128,18 @@ def _parse_result(text: str) -> dict | None:
 # ---------------------------------------------------------------------------
 
 def get_last_logged_date() -> str | None:
-    csv_path = Path(config.RAW_CSV)
-    if not csv_path.exists():
+    # Route through load_draws() so column normalization + validation run
+    # consistently, AND so missing-file is treated identically (return None).
+    # Lazy import: avoids circular dependency when monitor.py is run as
+    # __main__ from a Playwright subprocess. Do NOT promote to top-level.
+    from src.data_loader import load_draws
+    try:
+        df = load_draws(config.RAW_CSV)
+    except FileNotFoundError:
         return None
-    df = pd.read_csv(csv_path)
     if df.empty:
         return None
-    df["date"] = pd.to_datetime(df["date"])
-    return df["date"].max().strftime("%Y-%m-%d")
+    return pd.to_datetime(df["date"]).max().strftime("%Y-%m-%d")
 
 
 def log_draw(draw: dict) -> bool:

@@ -54,18 +54,26 @@ def log_draw(date: str, numbers: list[int]) -> None:
     row = {"date": date, **{f"n{i+1}": v for i, v in enumerate(sorted(numbers))}}
     csv_path = config.RAW_CSV
 
-    if Path(csv_path).exists():
-        from src.data_loader import _normalize_columns
-        df = _normalize_columns(pd.read_csv(csv_path))
-        # Avoid duplicate dates
-        if date in df["date"].astype(str).values:
-            print(f"[feedback] Draw for {date} already exists - skipping append.")
-            return
-        df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
-    else:
-        df = pd.DataFrame([row])
+    if not Path(csv_path).exists():
+        raise FileNotFoundError(
+            f"[feedback] '{csv_path}' not found. Refusing to bootstrap a 1-row "
+            f"history file over a real-data path (incident 2026-04-23). "
+            f"Restore the file from backup, or initialize it with real draw data first."
+        )
 
-    df.to_csv(csv_path, index=False)
+    from src.data_loader import _normalize_columns
+    df = _normalize_columns(pd.read_csv(csv_path))
+    # Avoid duplicate dates
+    if date in df["date"].astype(str).values:
+        print(f"[feedback] Draw for {date} already exists - skipping append.")
+        return
+    df_new = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+
+    # Safety guard: row count must strictly grow on append.
+    assert len(df_new) > len(df), \
+        f"[feedback] append guard: row count must grow ({len(df)} -> {len(df_new)})"
+
+    df_new.to_csv(csv_path, index=False)
     print(f"[feedback] Draw logged: {date}  {sorted(numbers)}")
 
 

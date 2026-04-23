@@ -63,9 +63,40 @@ def test_validate_raises_out_of_range():
         _validate(df)
 
 
-def test_load_draws_fallback_synthetic(monkeypatch, tmp_path):
-    synthetic_path = str(tmp_path / "synthetic.csv")
-    monkeypatch.setattr(config, "RAW_CSV", synthetic_path)
-    df = load_draws(str(tmp_path / "does_not_exist.csv"))
-    assert len(df) > 0
-    assert "n1" in df.columns
+def test_load_draws_raises_when_missing(tmp_path):
+    """load_draws() must NOT silently regenerate synthetic data over a missing real-data path.
+
+    Regression guard for incident 2026-04-23: a silent fallback once overwrote
+    the user's real LottoMax CSV with 2000 fake rows on first run.
+    """
+    missing = tmp_path / "does_not_exist.csv"
+    with pytest.raises(FileNotFoundError, match="Refusing to silently regenerate"):
+        load_draws(str(missing))
+
+
+def test_generate_synthetic_default_path_is_safe(tmp_path, monkeypatch):
+    """generate_synthetic() default save_path must NOT be config.RAW_CSV.
+
+    Regression guard for incident 2026-04-23: the prior default silently
+    overwrote the real-data path on every call with no args.
+    """
+    from src.data_loader import SYNTHETIC_CSV
+    assert SYNTHETIC_CSV != config.RAW_CSV, (
+        f"Synthetic default path must differ from real-data path "
+        f"(both are {SYNTHETIC_CSV!r}); will overwrite real data."
+    )
+    assert "synthetic" in SYNTHETIC_CSV.lower(), (
+        f"Synthetic default path {SYNTHETIC_CSV!r} should be obviously named."
+    )
+
+
+def test_generate_synthetic_bare_filename(tmp_path, monkeypatch):
+    """generate_synthetic() must accept a save_path with no directory component.
+
+    Regression guard (S1 2026-04-23): os.makedirs("") raised an unhelpful
+    FileNotFoundError on Windows when save_path was a bare filename.
+    """
+    monkeypatch.chdir(tmp_path)
+    df = generate_synthetic(n_draws=10, save_path="bare.csv")
+    assert len(df) == 10
+    assert (tmp_path / "bare.csv").exists()

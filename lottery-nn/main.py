@@ -142,7 +142,11 @@ def cmd_log(args):
 
 
 def cmd_data(_args):
-    generate_synthetic()
+    from src.data_loader import SYNTHETIC_CSV
+    df = generate_synthetic()
+    print(f"[main] Synthetic test data written to '{SYNTHETIC_CSV}' "
+          f"(NOT the real-data path '{config.RAW_CSV}'). "
+          f"To use it for training, point config.RAW_CSV at it explicitly.")
 
 
 # ---------------------------------------------------------------------------

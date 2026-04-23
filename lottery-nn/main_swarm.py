@@ -11,10 +11,10 @@ Commands
       Generate play suggestions for the specified lottery using the
       shared encoder checkpoint.
 
-  python main_swarm.py log --lottery 649|dailygrand
-      --date YYYY-MM-DD --numbers N [N ...] --bonus N
-      Append a new draw result for 6/49 or Daily Grand.
-      (LottoMax logging uses the original main.py)
+  python main_swarm.py log --lottery lottomax|649|dailygrand
+      --date YYYY-MM-DD --numbers N [N ...] [--bonus N]
+      Append a new draw result. --bonus is only valid (and required)
+      for Daily Grand; LottoMax and 6/49 have no player-picked bonus.
 
   python main_swarm.py status
       Show swarm_state.json -- last scores, training count, agent weights.
@@ -188,10 +188,6 @@ def cmd_predict(args):
 
 def cmd_log(args):
     lottery = args.lottery
-    if lottery not in ("649", "dailygrand"):
-        print("[swarm] Use main.py log for LottoMax. This command handles 649 and dailygrand.")
-        sys.exit(1)
-
     cfg      = LOTTERY_CONFIGS[lottery]
     csv_path = cfg["csv"]
     date     = args.date or datetime.today().strftime("%Y-%m-%d")
@@ -207,6 +203,10 @@ def cmd_log(args):
         print(f"[swarm] Expected {main_count} numbers for {cfg['name']}, got {len(args.numbers)}.")
         sys.exit(1)
 
+    if len(set(args.numbers)) != main_count:
+        print(f"[swarm] --numbers must contain {main_count} unique values, got duplicates in {args.numbers}.")
+        sys.exit(1)
+
     main_max  = cfg["main_max"]
     has_bonus = cfg.get("has_bonus", False)
     for n in args.numbers:
@@ -218,6 +218,11 @@ def cmd_log(args):
         if args.bonus is None or not (1 <= args.bonus <= bonus_max):
             print(f"[swarm] --bonus is required for {cfg['name']} and must be 1-{bonus_max}.")
             sys.exit(1)
+    else:
+        if args.bonus is not None:
+            print(f"[swarm] {cfg['name']} has no player-picked bonus -- drop --bonus. "
+                  f"(Bonus is machine-drawn by OLG and not part of plays.)")
+            sys.exit(1)
 
     if has_bonus:
         bonus_col = cfg.get("bonus_col", "bonus")
@@ -228,16 +233,26 @@ def cmd_log(args):
         row_vals  = [date] + sorted(args.numbers)
     row = dict(zip(row_cols, row_vals))
 
-    if Path(csv_path).exists():
-        df = pd.read_csv(csv_path)
-        if date in df["date"].astype(str).values:
-            print(f"[swarm] Draw for {date} already exists -- skipping.")
-            return
-        df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
-    else:
-        df = pd.DataFrame([row])
+    if not Path(csv_path).exists():
+        header = ",".join(row_cols)
+        print(f"[swarm] '{csv_path}' not found. Refusing to bootstrap a 1-row "
+              f"history file over a real-data path (incident 2026-04-23). "
+              f"To start fresh, create the file first with just the header row:\n"
+              f"  echo '{header}' > {csv_path}\n"
+              f"Then re-run this log command.")
+        sys.exit(1)
 
-    df.to_csv(csv_path, index=False)
+    df = pd.read_csv(csv_path)
+    if date in df["date"].astype(str).values:
+        print(f"[swarm] Draw for {date} already exists -- skipping.")
+        return
+    df_new = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+
+    # Safety guard: row count must strictly grow on append.
+    assert len(df_new) > len(df), \
+        f"[swarm] append guard: row count must grow ({len(df)} -> {len(df_new)})"
+
+    df_new.to_csv(csv_path, index=False)
     bonus_info = f"  bonus={args.bonus}" if has_bonus else ""
     print(f"[swarm] {cfg['name']} draw logged: {date}  {sorted(args.numbers)}{bonus_info}")
 
@@ -603,8 +618,8 @@ def _build_parser() -> argparse.ArgumentParser:
     p_pred.add_argument("--temperature", type=float, default=1.2)
 
     # log
-    p_log = sub.add_parser("log", help="Log a new draw result (649 or dailygrand)")
-    p_log.add_argument("--lottery", required=True, choices=["649", "dailygrand"])
+    p_log = sub.add_parser("log", help="Log a new draw result")
+    p_log.add_argument("--lottery", required=True, choices=list(LOTTERY_CONFIGS))
     p_log.add_argument("--date",    default="")
     p_log.add_argument("--numbers", type=int, nargs="+", required=True)
     p_log.add_argument("--bonus",   type=int, default=None)

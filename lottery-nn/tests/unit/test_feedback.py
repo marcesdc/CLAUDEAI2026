@@ -36,6 +36,21 @@ def test_log_draw_bad_count_raises(minimal_draws_csv, monkeypatch):
         log_draw("2026-02-01", [1, 5, 10])
 
 
+def test_log_draw_raises_when_csv_missing(tmp_path, monkeypatch):
+    """log_draw() must NOT bootstrap a 1-row file over a missing real-data path.
+
+    Regression guard for incident 2026-04-23 (W1): the prior code created
+    a fresh DataFrame with just the new row when the CSV was missing,
+    silently replacing the entire history with one entry.
+    """
+    missing = str(tmp_path / "does_not_exist.csv")
+    monkeypatch.setattr(config, "RAW_CSV", missing)
+    with pytest.raises(FileNotFoundError, match="Refusing to bootstrap"):
+        log_draw("2026-02-01", [1, 5, 10, 15, 20, 25, 30])
+    # File must NOT have been created
+    assert not Path(missing).exists()
+
+
 def test_recency_weights_sum():
     w = recency_weights(20)
     assert abs(w.sum() - 1.0) < 1e-5
