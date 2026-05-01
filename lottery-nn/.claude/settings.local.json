@@ -12,7 +12,9 @@
       "Bash(/c/Python314/python.exe -c \"import torch; print\\(torch.__version__\\)\")",
       "WebFetch(domain:gateway.www.olg.ca)",
       "WebFetch(domain:gateway.can2.mkodo.io)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git check-ignore *)",
+      "Bash(git add *)"
     ]
   }
 }

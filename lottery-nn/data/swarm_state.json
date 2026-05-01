@@ -1,39 +1,39 @@
 {
-  "last_updated": "2026-04-23",
-  "joint_train_count": 16,
-  "joint_val_loss": 0.064166,
+  "last_updated": "2026-04-30",
+  "joint_train_count": 18,
+  "joint_val_loss": 0.223072,
   "agent_weights": {
     "lottomax": {
-      "alpha": 5.0,
-      "beta": 11.0,
-      "weight": 0.3629705498131062,
-      "draws_scored": 2
+      "alpha": 8.0,
+      "beta": 29.0,
+      "weight": 0.24625542081577162,
+      "draws_scored": 5
     },
     "649": {
-      "alpha": 6.0,
-      "beta": 44.0,
-      "weight": 0.13952242435398288,
-      "draws_scored": 8
+      "alpha": 7.0,
+      "beta": 55.0,
+      "weight": 0.13023129553258855,
+      "draws_scored": 10
     },
     "dailygrand": {
       "alpha": 7.0,
-      "beta": 20.0,
-      "weight": 0.296503428599251,
-      "draws_scored": 5
+      "beta": 30.0,
+      "weight": 0.21738836737952377,
+      "draws_scored": 7
     }
   },
   "last_scores": {
     "lottomax": {
-      "hits": 1,
-      "date": "2026-04-17"
+      "hits": 2,
+      "date": "2026-04-28"
     },
     "649": {
       "hits": 0,
-      "date": "2099-01-01"
+      "date": "2026-04-29"
     },
     "dailygrand": {
-      "hits": 1,
-      "date": "2026-04-16"
+      "hits": 0,
+      "date": "2026-04-27"
     }
   }
 }

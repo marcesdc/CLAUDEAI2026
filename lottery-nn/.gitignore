@@ -5,9 +5,12 @@ __pycache__/
 .env
 
 data/*.csv
+data/*.csv.*
 data/*.npy
 models/*.png
 models/*.pt
+
+.tmp/
 
 .venv/
 venv/
