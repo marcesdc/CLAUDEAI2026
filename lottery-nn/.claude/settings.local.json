@@ -24,7 +24,20 @@
       "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_checkpoint_meta.py -v --tb=short)",
       "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_log_force.py -v --tb=short)",
       "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_bandit_tier.py -v --tb=short)",
-      "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_diversity_guard.py tests/unit/test_critic.py -v --tb=short)"
+      "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_diversity_guard.py tests/unit/test_critic.py -v --tb=short)",
+      "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_augmentation.py -v --tb=short)",
+      "Bash(\"C:/Python314/python.exe\" -m pytest tests/ --tb=short)",
+      "Bash(\"C:/Python314/python.exe\" main_swarm.py log --help)",
+      "Bash(\"C:/Python314/python.exe\" main.py log --help)",
+      "Bash(\"C:/Python314/python.exe\" main_swarm.py status)",
+      "Bash(\"C:/Python314/python.exe\" main.py --help)",
+      "Bash(\"C:/Python314/python.exe\" main_swarm.py predict --lottery lottomax --plays 1)",
+      "Bash(C:\\\\Python314\\\\python.exe -m pytest tests/ -v --tb=short)",
+      "Bash(\"C:/Python314/python.exe\" -m pytest \"d:/AI - 2026/CLAUDEAI2026/lottery-nn/tests/\" -v --tb=short)",
+      "Bash(\"C:/Python314/python.exe\" -m pytest \"d:/AI - 2026/CLAUDEAI2026/lottery-nn/tests/\" -v --tb=short --cov=src --cov-report=term-missing)",
+      "Bash(\"C:/Python314/python.exe\" -m pytest tests/ --tb=short -q)",
+      "Skill(schedule)",
+      "Skill(schedule:*)"
     ]
   }
 }
