@@ -18,18 +18,11 @@ C:\Python314\python.exe main_swarm.py log --lottery <name> --date YYYY-MM-DD --n
 C:\Python314\python.exe main_swarm.py status
 ```
 
-`--bonus` only applies to Daily Grand (player-picked Grand 1-7). LottoMax/6/49 bonus is machine-drawn and not part of plays.
+`--bonus` is for Daily Grand only (player-picked Grand 1-7). LottoMax/6/49 bonus is machine-drawn.
+`--force` on `log` overwrites an existing date in place (1:1 row replace; 2026-04-23 missing-CSV guard still wins).
 **After each real draw:** `log` → optional `joint-train` → `predict`. Full retrain only when adding a batch of historical rows.
 
-## Per-lottery shape (single source of truth: `src/preprocessing_swarm.py::LOTTERY_CONFIGS`)
-
-| Lottery     | main_count | main_max | has_bonus | bonus_col |
-|-------------|------------|----------|-----------|-----------|
-| lottomax    | 7          | 52       | False     | -         |
-| 649         | 6          | 49       | False     | -         |
-| dailygrand  | 5          | 49       | True (1-7)| `grand`   |
-
-Other knobs in `config.py`: `LINES_PER_PLAY`, `SEQUENCE_LEN`, `EPOCHS`/`PATIENCE`, `TEMPERATURE`, `NUM_PLAYS`, `FOCAL_GAMMA`, `FOCAL_ALPHA`.
+Per-lottery shape lives in `src/preprocessing_swarm.py::LOTTERY_CONFIGS` (main_count / main_max / has_bonus / bonus_col). Hyperparameters + feature flags live in `config.py`.
 
 ## Data
 
@@ -48,17 +41,18 @@ CSVs under `data/` — `date` is any pandas-parseable format:
 - Loss: focal loss for main numbers (`src/focal_loss.py`); CrossEntropyLoss × 0.3 for bonus head (Daily Grand only).
 - Single-lottery alternative: `LotteryTransformer` / `LotteryLSTM` in `src/model.py`.
 
-## Active gotchas (don't get burned twice)
+## Active gotchas
 
-- **OLG page needs JavaScript** — plain `WebFetch` returns empty; gateway APIs need auth. Use Playwright MCP (`agent/run.py monitor|watch`).
-- **Daily Grand bonus column is `grand`** in the CSV; `load_lottery_df()` renames it internally — do not rename in CSV.
-- **PyTorch nested-tensor warning on swarm train** (`enable_nested_tensor is True, but ... norm_first was True`) — non-fatal Pre-LN noise. Ignore.
-- **Cleaning scripts must `assert len(df) == expected` before writing CSVs** — a regex cleaner once wiped `draws_649.csv` to header-only with no backup.
-- **LottoMax pool is 1-52 (2026 rule change), not 1-50** — `C(52,7) = 133,784,560`. Old hardcoded `50`/`43` are stale.
+- **OLG page needs JavaScript.** Plain `WebFetch` returns empty; use Playwright MCP via `agent/run.py monitor|watch`.
+- **Daily Grand bonus CSV column is `grand`** (renamed to `bonus` in-memory by `load_lottery_df()`). Don't rename in the CSV.
+- **PyTorch `enable_nested_tensor` warning on swarm train** — non-fatal Pre-LN noise; ignore.
+- **Never silently overwrite `data/draws*.csv`.** Clean/regen scripts must assert row count before writing (incident 2026-04-23).
+- **LottoMax pool is 1-52 since the 2026 rule change** — `C(52,7) = 133,784,560`. Any hardcoded `50` is stale.
+- **Checkpoint metadata sidecar** (`models/best.meta.json` / `models/best_swarm.meta.json`) — written on save, asserted on load. Pool/head-size mismatch raises `RuntimeError`. Missing sidecar = legacy checkpoint, warn-only.
 
-## Phase status
+## Phase / state
 
-Phase 2 in progress (focal loss + bandit + QA team done; Actor-Critic + Reflexion + Thompson-sampling agent weights still pending). Check `git log` for current state. Phase 3 (DeepAR / probabilistic LSTM / N-BEATS / Pyro) not started.
+Current state lives in `git log`, `data/swarm_state.json`, and the project memory at `~/.claude/projects/d--AI---2026-CLAUDEAI2026/memory/`. Don't re-document it here.
 
 ## QA Agents — MANDATORY
 
