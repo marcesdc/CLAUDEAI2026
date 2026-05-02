@@ -120,8 +120,8 @@ def cmd_log(args):
     # 1. Score last prediction against the actual draw
     score_last_prediction(args.numbers, draw_date=date)
 
-    # 2. Append the new draw to draws.csv
-    log_draw(date, args.numbers)
+    # 2. Append (or overwrite, if --force) the new draw to draws.csv
+    log_draw(date, args.numbers, force=getattr(args, "force", False))
 
     if args.no_retrain:
         return
@@ -175,6 +175,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--date", default="", help="Draw date e.g. 2026-03-25")
     parser.add_argument("--numbers", type=int, nargs=config.LOTTERY["main_count"], metavar="N", help="The drawn numbers")
     parser.add_argument("--no-retrain", action="store_true", help="Score only, skip retraining")
+    parser.add_argument("--force", action="store_true",
+                        help="Overwrite an existing draw for this date instead of skipping")
     return parser
 
 

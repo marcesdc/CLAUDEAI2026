@@ -65,10 +65,19 @@ from src.bandit import (
     temperature_from_weight,
     update as bandit_update,
 )
-from src.model_swarm import SharedLotteryTransformer, count_params, SEQ_LEN
+from src.checkpoint_meta import assert_compatible as assert_ckpt_compatible, write_meta as write_ckpt_meta
+from src.model_swarm import (
+    BONUS_HEAD_SIZES,
+    MAIN_HEAD_SIZES,
+    POOL_MAX,
+    SEQ_LEN,
+    SharedLotteryTransformer,
+    count_params,
+)
 from src.preprocessing_swarm import (
     LOTTERY_CONFIGS,
     build_all_lottery_data,
+    build_all_lottery_splits,
     get_last_window,
     split,
 )
@@ -89,12 +98,20 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def cmd_joint_train(args):
     os.makedirs("models", exist_ok=True)
 
-    all_data = build_all_lottery_data(seq_len=SEQ_LEN)
-
-    # Split each lottery chronologically
-    splits = {}
-    for name, (X, y_main, y_bonus) in all_data.items():
-        splits[name] = split(X, y_main, y_bonus)
+    augment = bool(getattr(config, "AUGMENT_ENABLED", False))
+    if augment:
+        splits = build_all_lottery_splits(
+            seq_len=SEQ_LEN,
+            augment=True,
+            aug_factor=int(getattr(config, "AUGMENT_FACTOR", 3)),
+            jitter_range=int(getattr(config, "AUGMENT_JITTER", 2)),
+            mixup_alpha=float(getattr(config, "AUGMENT_MIXUP_ALPHA", 0.0)),
+        )
+    else:
+        all_data = build_all_lottery_data(seq_len=SEQ_LEN)
+        splits = {}
+        for name, (X, y_main, y_bonus) in all_data.items():
+            splits[name] = split(X, y_main, y_bonus)
 
     # Build loaders per lottery per split
     train_loaders = _make_loaders(splits, "train", args.batch_size, shuffle=True)
@@ -132,6 +149,7 @@ def cmd_joint_train(args):
             best_val   = val_loss
             patience_c = 0
             torch.save(model.state_dict(), SWARM_CHECKPOINT)
+            write_ckpt_meta(SWARM_CHECKPOINT, POOL_MAX, MAIN_HEAD_SIZES, BONUS_HEAD_SIZES)
             print(f"  [saved] {SWARM_CHECKPOINT}  (val={best_val:.4f})")
         else:
             patience_c += 1
@@ -164,6 +182,7 @@ def cmd_predict(args):
         sys.exit(1)
 
     cfg = LOTTERY_CONFIGS[lottery]
+    assert_ckpt_compatible(SWARM_CHECKPOINT, POOL_MAX, MAIN_HEAD_SIZES, BONUS_HEAD_SIZES)
     model = SharedLotteryTransformer().to(DEVICE)
     model.load_state_dict(torch.load(SWARM_CHECKPOINT, map_location=DEVICE, weights_only=True))
     model.eval()
@@ -178,9 +197,21 @@ def cmd_predict(args):
         print(f"[swarm] Thompson weight={entry['weight']:.3f} -> temperature={temperature}")
 
     window = get_last_window(lottery, seq_len=SEQ_LEN)
+
+    lottery_stats = None
+    if getattr(config, "CRITIC_ENABLED", True):
+        from src.critic import compute_lottery_stats
+        from src.preprocessing_swarm import load_lottery_df
+        df_hist = load_lottery_df(lottery)
+        lottery_stats = compute_lottery_stats(
+            df_hist, cfg,
+            percentiles=getattr(config, "CRITIC_PERCENTILES", (5, 95)),
+        )
+
     plays  = _sample_plays(
         model, window, cfg,
         n=args.plays, temperature=temperature,
+        lottery_stats=lottery_stats,
     )
     _print_plays(plays, cfg)
     _save_swarm_prediction(lottery, plays)
@@ -243,11 +274,29 @@ def cmd_log(args):
         sys.exit(1)
 
     df = pd.read_csv(csv_path)
+    force = getattr(args, "force", False)
     if date in df["date"].astype(str).values:
-        print(f"[swarm] Draw for {date} already exists -- skipping.")
+        if not force:
+            print(f"[swarm] Draw for {date} already exists -- skipping. "
+                  f"Pass --force to overwrite.")
+            return
+        # Force-overwrite: drop the existing row, append the new one, count stays equal.
+        old_row = df[df["date"].astype(str) == date].iloc[0]
+        old_nums = sorted(int(old_row[f"n{i}"]) for i in range(1, main_count + 1))
+        df_new = df[df["date"].astype(str) != date].copy()
+        df_new = pd.concat([df_new, pd.DataFrame([row])], ignore_index=True)
+        assert len(df_new) == len(df), \
+            f"[swarm] force-overwrite guard: row count must stay equal ({len(df)} -> {len(df_new)})"
+        df_new.to_csv(csv_path, index=False)
+        bonus_info = f"  bonus={args.bonus}" if has_bonus else ""
+        print(f"[swarm] {cfg['name']} draw overwritten: {date}  "
+              f"{old_nums} -> {sorted(args.numbers)}{bonus_info}")
+        # Score + bandit update for the corrected numbers.
+        hits = _score_swarm_prediction(lottery, args.numbers, cfg["main_count"])
+        _update_swarm_state(lottery=lottery, hits=hits, draw_date=date)
         return
-    df_new = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
 
+    df_new = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
     # Safety guard: row count must strictly grow on append.
     assert len(df_new) > len(df), \
         f"[swarm] append guard: row count must grow ({len(df)} -> {len(df_new)})"
@@ -304,6 +353,7 @@ def _prune_and_finetune(model, init_state, train_loaders, val_loaders, args, his
     if not Path(SWARM_CHECKPOINT).exists():
         print("[prune] No checkpoint found -- skipping prune phase.")
         return pretrain_best_val
+    assert_ckpt_compatible(SWARM_CHECKPOINT, POOL_MAX, MAIN_HEAD_SIZES, BONUS_HEAD_SIZES)
     model.load_state_dict(torch.load(SWARM_CHECKPOINT, map_location=DEVICE, weights_only=True))
 
     print(f"[prune] Applying {args.prune_percent * 100:.0f}% magnitude pruning ...")
@@ -346,6 +396,7 @@ def _prune_and_finetune(model, init_state, train_loaders, val_loaders, args, his
             best_val   = val_loss
             patience_c = 0
             torch.save(model.state_dict(), SWARM_CHECKPOINT)
+            write_ckpt_meta(SWARM_CHECKPOINT, POOL_MAX, MAIN_HEAD_SIZES, BONUS_HEAD_SIZES)
             print(f"  [saved] {SWARM_CHECKPOINT}  (val={best_val:.4f})")
         else:
             patience_c += 1
@@ -432,7 +483,10 @@ def _run_joint_epoch(model, loaders: dict, optimizer, train: bool, masks=None) -
 # Prediction internals
 # ---------------------------------------------------------------------------
 
-def _sample_plays(model, window: np.ndarray, cfg: dict, n: int, temperature: float) -> list:
+def _sample_plays(model, window: np.ndarray, cfg: dict, n: int, temperature: float,
+                  lottery_stats: dict | None = None) -> list:
+    from src.diversity import resolve_max_overlap, sample_diverse_line
+
     x = torch.tensor(window[None], dtype=torch.float32).to(DEVICE)  # (1, T, F)
     lid = cfg["id"]
 
@@ -447,19 +501,69 @@ def _sample_plays(model, window: np.ndarray, cfg: dict, n: int, temperature: flo
     has_bonus  = cfg.get("has_bonus", False)
     bonus_max  = cfg["bonus_max"] if has_bonus else None
     lines_per  = cfg.get("lines_per", 1)
+
+    diversity_on = bool(getattr(config, "DIVERSITY_GUARD_ENABLED", True))
+    max_overlap  = resolve_max_overlap(getattr(config, "DIVERSITY_MAX_OVERLAP", None), main_count)
+    max_attempts = int(getattr(config, "DIVERSITY_MAX_ATTEMPTS", 20))
+    critic_on    = bool(getattr(config, "CRITIC_ENABLED", True)) and lottery_stats is not None
+
     rng   = np.random.default_rng()
     plays = []
     for _ in range(n):
         lines = []
         for _ in range(lines_per):
-            nums = sorted(
-                int(v) + 1
-                for v in rng.choice(main_max, size=main_count, replace=False, p=main_probs[:main_max])
-            )
+            if diversity_on or critic_on:
+                nums = _sample_one_line_with_filters(
+                    rng, main_probs, main_max, main_count, lines,
+                    max_overlap=max_overlap if diversity_on else main_count,
+                    max_attempts=max_attempts,
+                    lottery_stats=lottery_stats if critic_on else None,
+                )
+            else:
+                nums = sorted(
+                    int(v) + 1
+                    for v in rng.choice(main_max, size=main_count, replace=False, p=main_probs[:main_max])
+                )
             lines.append(nums)
         bonus_num = int(rng.choice(bonus_max, p=bonus_probs[:bonus_max]) + 1) if has_bonus else None
         plays.append({"lines": lines, "bonus": bonus_num})
     return plays
+
+
+def _sample_one_line_with_filters(rng, main_probs, main_max, main_count,
+                                   existing_lines, *,
+                                   max_overlap, max_attempts,
+                                   lottery_stats=None):
+    """
+    Single-line sampler with a shared attempt budget across the diversity
+    guard (B2) and the Reflexion-style critic (B3). Returns the last sampled
+    candidate if all attempts fail, logging a single warning.
+    """
+    from src.critic import critic_filter
+    from src.diversity import is_too_similar, sample_diverse_line
+
+    probs = main_probs[:main_max]
+    last_nums: list[int] = []
+    for attempt in range(max_attempts):
+        nums = sorted(
+            int(v) + 1
+            for v in rng.choice(main_max, size=main_count, replace=False, p=probs)
+        )
+        last_nums = nums
+        # Diversity check (skipped when no peers or guard disabled via large max_overlap).
+        if existing_lines and is_too_similar(nums, existing_lines, max_overlap):
+            continue
+        # Critic check (skipped when stats not provided).
+        if lottery_stats is not None and not critic_filter(nums, lottery_stats):
+            continue
+        return nums
+
+    print(
+        f"[critic+diversity] gave up after {max_attempts} attempts -- "
+        f"distribution too concentrated or critic too strict. Returning last sample.",
+        file=sys.stderr,
+    )
+    return last_nums
 
 
 def _print_plays(plays: list, cfg: dict) -> None:
@@ -508,7 +612,10 @@ def _update_swarm_state(lottery: str = None, hits=None, draw_date: str = None, j
         }
         cfg = LOTTERY_CONFIGS[lottery]
         weights = state.setdefault("agent_weights", {})
-        state["agent_weights"] = bandit_update(weights, lottery, hits, cfg["main_count"])
+        state["agent_weights"] = bandit_update(
+            weights, lottery, hits, cfg["main_count"],
+            tier_weighted=getattr(config, "BANDIT_TIER_WEIGHTED", False),
+        )
 
     with open(SWARM_STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, indent=2)
@@ -623,6 +730,8 @@ def _build_parser() -> argparse.ArgumentParser:
     p_log.add_argument("--date",    default="")
     p_log.add_argument("--numbers", type=int, nargs="+", required=True)
     p_log.add_argument("--bonus",   type=int, default=None)
+    p_log.add_argument("--force",   action="store_true",
+                       help="Overwrite an existing draw for this date instead of skipping")
 
     # status
     sub.add_parser("status", help="Show swarm state")

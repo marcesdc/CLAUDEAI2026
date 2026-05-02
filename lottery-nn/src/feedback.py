@@ -28,19 +28,21 @@ SCORE_LOG  = "data/score_log.csv"
 # Logging a new draw
 # ---------------------------------------------------------------------------
 
-def log_draw(date: str, numbers: list[int]) -> None:
+def log_draw(date: str, numbers: list[int], force: bool = False) -> None:
     """
-    Append a new draw to draws.csv.
+    Append a new draw to draws.csv, or overwrite an existing row when force=True.
 
     Parameters
     ----------
     date    : date string, e.g. '2026-03-25'
     numbers : list of 7 ints (main balls)
+    force   : when True, replace an existing row for the same date (used to
+              correct a previously logged draw). Without force, duplicate dates
+              are skipped silently.
     """
     if len(numbers) != config.LOTTERY["main_count"]:
         raise ValueError(f"Expected {config.LOTTERY['main_count']} numbers, got {len(numbers)}.")
 
-    # Basic date format check
     try:
         datetime.strptime(date, "%Y-%m-%d")
     except ValueError:
@@ -54,6 +56,7 @@ def log_draw(date: str, numbers: list[int]) -> None:
     row = {"date": date, **{f"n{i+1}": v for i, v in enumerate(sorted(numbers))}}
     csv_path = config.RAW_CSV
 
+    # 2026-04-23 guard: never silently bootstrap over a missing real-data path.
     if not Path(csv_path).exists():
         raise FileNotFoundError(
             f"[feedback] '{csv_path}' not found. Refusing to bootstrap a 1-row "
@@ -63,16 +66,28 @@ def log_draw(date: str, numbers: list[int]) -> None:
 
     from src.data_loader import _normalize_columns
     df = _normalize_columns(pd.read_csv(csv_path))
-    # Avoid duplicate dates
-    if date in df["date"].astype(str).values:
-        print(f"[feedback] Draw for {date} already exists - skipping append.")
-        return
-    df_new = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
 
-    # Safety guard: row count must strictly grow on append.
+    if date in df["date"].astype(str).values:
+        if not force:
+            print(f"[feedback] Draw for {date} already exists - skipping append. "
+                  f"Pass force=True (or --force) to overwrite.")
+            return
+        old_row = df[df["date"].astype(str) == date].iloc[0]
+        old_nums = sorted(int(old_row[f"n{i+1}"]) for i in range(config.LOTTERY["main_count"]))
+        df_new = df[df["date"].astype(str) != date].copy()
+        df_new = pd.concat([df_new, pd.DataFrame([row])], ignore_index=True)
+        # Replacement guard: row count must stay equal.
+        assert len(df_new) == len(df), \
+            f"[feedback] force-overwrite guard: row count must stay equal ({len(df)} -> {len(df_new)})"
+        df_new.to_csv(csv_path, index=False)
+        print(f"[feedback] Overwriting existing draw for {date}: "
+              f"{old_nums} -> {sorted(numbers)}")
+        return
+
+    df_new = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+    # Append guard: row count must strictly grow.
     assert len(df_new) > len(df), \
         f"[feedback] append guard: row count must grow ({len(df)} -> {len(df_new)})"
-
     df_new.to_csv(csv_path, index=False)
     print(f"[feedback] Draw logged: {date}  {sorted(numbers)}")
 

@@ -19,6 +19,14 @@ import numpy as np
 _DEFAULT_ALPHA = 1.0
 _DEFAULT_BETA  = 1.0
 
+# Tier table for tier_reward(): rewards 3+ matches exponentially more than
+# 1-2 matches, mirroring real OLG prize structures where small matches pay
+# a token amount and large matches pay orders of magnitude more.
+# Capped at 50 alpha-units per draw so a single fluke can't dominate the
+# Beta posterior.
+_TIER_ALPHA_TABLE = {0: 0.0, 1: 0.5, 2: 1.0, 3: 4.0, 4: 12.0, 5: 30.0, 6: 80.0, 7: 200.0}
+_TIER_ALPHA_CAP   = 50.0
+
 
 def default_entry() -> dict:
     """Return a fresh Thompson entry with uninformative Beta(1,1) prior."""
@@ -30,7 +38,34 @@ def default_entry() -> dict:
     }
 
 
-def update(agent_weights: dict, lottery: str, hits: int, main_count: int) -> dict:
+def tier_reward(hits: int, main_count: int, lottery: str = "") -> tuple[float, float]:
+    """
+    Map a hit count to (alpha_delta, beta_delta) for tier-weighted Thompson.
+
+    The alpha increment scales super-linearly with hits so a single 3-match
+    contributes more than three 1-matches combined. Beta_delta is just the
+    miss count, keeping the Beta distribution well-defined.
+
+    Parameters
+    ----------
+    hits       : main-ball hits on the best-scoring line (clamped to main_count)
+    main_count : total main balls drawn for this lottery (used for misses)
+    lottery    : reserved for future per-lottery scaling; currently unused
+
+    Returns (alpha_delta, beta_delta), both non-negative floats.
+    """
+    h = max(0, min(int(hits), int(main_count)))
+    alpha_delta = min(_TIER_ALPHA_TABLE.get(h, 0.0), _TIER_ALPHA_CAP)
+    beta_delta  = float(max(int(main_count) - h, 0))
+    return alpha_delta, beta_delta
+
+
+def update(agent_weights: dict,
+           lottery: str,
+           hits: int,
+           main_count: int,
+           *,
+           tier_weighted: bool = False) -> dict:
     """
     Update Thompson parameters for *lottery* after a scored draw.
 
@@ -40,14 +75,22 @@ def update(agent_weights: dict, lottery: str, hits: int, main_count: int) -> dic
     lottery       : 'lottomax' | '649' | 'dailygrand'
     hits          : main-ball hits on the best-scoring line (0..main_count)
     main_count    : total main balls drawn for this lottery
+    tier_weighted : when True, alpha grows according to tier_reward() (3+ hits
+                    weighted exponentially). When False (default), behavior is
+                    the original linear `alpha += hits`.
 
     Returns the mutated agent_weights dict.
     """
     entry  = agent_weights.get(lottery, default_entry())
-    misses = max(main_count - hits, 0)
 
-    entry["alpha"]        = entry.get("alpha", _DEFAULT_ALPHA) + hits
-    entry["beta"]         = entry.get("beta",  _DEFAULT_BETA)  + misses
+    if tier_weighted:
+        alpha_d, beta_d = tier_reward(hits, main_count, lottery)
+    else:
+        alpha_d = float(hits)
+        beta_d  = float(max(main_count - hits, 0))
+
+    entry["alpha"]        = entry.get("alpha", _DEFAULT_ALPHA) + alpha_d
+    entry["beta"]         = entry.get("beta",  _DEFAULT_BETA)  + beta_d
     entry["weight"]       = float(np.random.beta(entry["alpha"], entry["beta"]))
     entry["draws_scored"] = entry.get("draws_scored", 0) + 1
 

@@ -18,7 +18,13 @@
       "Bash(C:/Python314/python.exe -c \"import pandas as pd; df = pd.read_csv\\('data/draws.csv'\\); print\\('rows:', len\\(df\\)\\); print\\(df.tail\\(3\\).to_string\\(index=False\\)\\)\")",
       "Bash(C:/Python314/python.exe main_swarm.py log --lottery lottomax --date 2026-05-01 --numbers 9 13 15 25 27 35 52)",
       "Bash(C:/Python314/python.exe main_swarm.py joint-train)",
-      "Bash(C:/Python314/python.exe main_swarm.py predict --lottery lottomax)"
+      "Bash(C:/Python314/python.exe main_swarm.py predict --lottery lottomax)",
+      "Bash(Get-ChildItem -Path \"d:\\\\AI - 2026\\\\CLAUDEAI2026\\\\lottery-nn\\\\src\" -Filter \"*.py\" -Name)",
+      "Bash(C:\\\\Python314\\\\python.exe -m pytest tests/unit/test_checkpoint_meta.py -v --tb=short)",
+      "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_checkpoint_meta.py -v --tb=short)",
+      "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_log_force.py -v --tb=short)",
+      "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_bandit_tier.py -v --tb=short)",
+      "Bash(\"C:/Python314/python.exe\" -m pytest tests/unit/test_diversity_guard.py tests/unit/test_critic.py -v --tb=short)"
     ]
   }
 }

@@ -16,6 +16,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 import config
+from src.checkpoint_meta import write_meta as write_ckpt_meta
 from src.model import build_model, count_params
 from src.focal_loss import focal_loss_with_logits
 
@@ -89,6 +90,7 @@ def train(
             best_val_loss = val_loss
             patience_counter = 0
             torch.save(model.state_dict(), checkpoint)
+            _write_single_lottery_meta(checkpoint)
             print(f"  [saved] checkpoint  (val_loss={best_val_loss:.4f})")
         else:
             patience_counter += 1
@@ -104,6 +106,19 @@ def train(
 # ---------------------------------------------------------------------------
 # Internals
 # ---------------------------------------------------------------------------
+
+def _write_single_lottery_meta(checkpoint: str) -> None:
+    """Drop sidecar JSON describing the single-lottery checkpoint's shape."""
+    main_max  = int(config.LOTTERY["main_max"])
+    has_bonus = bool(config.LOTTERY.get("has_bonus", False))
+    bonus_max = int(config.LOTTERY.get("bonus_max", 0)) if has_bonus else 0
+    write_ckpt_meta(
+        checkpoint,
+        pool_max=main_max,
+        main_head_sizes=[main_max],
+        bonus_head_sizes=[bonus_max] if has_bonus else [],
+    )
+
 
 def _make_loader(
     X: np.ndarray,

@@ -63,3 +63,35 @@ FOCAL_ALPHA = 0.25  # positive-class weight in (0, 1); set to None to disable al
 # ---------------------------------------------------------------------------
 NUM_PLAYS = 1              # how many plays (tickets) to generate
 TEMPERATURE = 1.2          # >1 -> more diverse, <1 -> more concentrated
+
+# ---------------------------------------------------------------------------
+# Bandit / Thompson sampling
+# ---------------------------------------------------------------------------
+# When True, bandit.update() uses tier_reward() so 3+ hits dominate 1-2 hits.
+# Default OFF so swarm_state.json behavior is byte-identical to pre-Phase-2.
+BANDIT_TIER_WEIGHTED = False
+
+# ---------------------------------------------------------------------------
+# Diversity guard (B2) -- per-play line deduplication
+# ---------------------------------------------------------------------------
+DIVERSITY_GUARD_ENABLED = True
+DIVERSITY_MAX_OVERLAP   = None    # None -> main_count - 2 (per-lottery default)
+DIVERSITY_MAX_ATTEMPTS  = 20
+
+# ---------------------------------------------------------------------------
+# Reflexion-style critic (B3) -- reject pathological lines
+# ---------------------------------------------------------------------------
+CRITIC_ENABLED     = True
+CRITIC_PERCENTILES = (5, 95)
+
+# ---------------------------------------------------------------------------
+# Window-jitter data augmentation (B4)
+# ---------------------------------------------------------------------------
+AUGMENT_ENABLED      = False
+AUGMENT_FACTOR       = 3
+AUGMENT_JITTER       = 2
+AUGMENT_MIXUP_ALPHA  = 0.0
+
+# Note: single-lottery main.py uses RAW_CSV above; the swarm path in main_swarm.py
+# pulls per-lottery paths from src.preprocessing_swarm.LOTTERY_CONFIGS, the single
+# source of truth. Both converge on data/draws.csv for LottoMax.
