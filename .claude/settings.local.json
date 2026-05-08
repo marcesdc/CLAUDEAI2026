@@ -4,7 +4,31 @@
       "Bash(C:/Python314/python.exe *)",
       "Bash(pip *)",
       "Bash(git *)",
-      "Bash(npx *)"
+      "Bash(npx *)",
+      "Bash(Get-ChildItem -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Get-ChildItem -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(stat -c \"%y %n\" d:/CLAUDEAI2026/lottery-portfolio/src/*.py d:/CLAUDEAI2026/lottery-portfolio/main.py d:/CLAUDEAI2026/lottery-portfolio/config.py 2>/dev/null | sort -r | head -15)",
+      "Read(//d/CLAUDEAI2026/**)",
+      "Bash(dir \"C:\\\\Users\\\\Administrator\\\\.claude\\\\projects\\\\d--CLAUDEAI2026\\\\memory\")",
+      "Bash(C:\\\\Python314\\\\python.exe main_swarm.py log --lottery lottomax --date 2026-05-05 --numbers 3 4 9 15 21 26 48)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" main_swarm.py log --lottery lottomax --date 2026-05-05 --numbers 3 4 9 15 21 26 48)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" -m pip install -q -r requirements.txt)",
+      "Bash(cp \"d:\\\\CLAUDEAI2026\\\\lottery-nn\\\\data\\\\draws.csv\" \"d:\\\\CLAUDEAI2026\\\\lottery-portfolio\\\\data\\\\draws_lottomax.csv\")",
+      "Bash(cp \"d:\\\\CLAUDEAI2026\\\\lottery-nn\\\\data\\\\draws_649.csv\" \"d:\\\\CLAUDEAI2026\\\\lottery-portfolio\\\\data\\\\draws_649.csv\")",
+      "Bash(cp \"d:\\\\CLAUDEAI2026\\\\lottery-nn\\\\data\\\\draws_dailygrand.csv\" \"d:\\\\CLAUDEAI2026\\\\lottery-portfolio\\\\data\\\\draws_dailygrand.csv\")",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" main.py fit --lottery lottomax)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" main.py optimize --lottery lottomax)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\")",
+      "Bash(dir \"d:\\\\CLAUDEAI2026\\\\lottery-portfolio\\\\data\\\\\" *.csv)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" main.py status)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" main.py optimize --lottery lottomax --jackpot 5000000)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" main.py fit --lottery 649)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" main.py optimize --lottery 649 --jackpot 2000000)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" main.py fit --lottery dailygrand)",
+      "Bash(\"C:\\\\Python314\\\\python.exe\" main.py optimize --lottery dailygrand --jackpot 200000)"
     ]
   }
 }

@@ -1,54 +1,96 @@
 {
   "lotteries": {
     "649": {
+      "fit": {
+        "date": "2026-05-08",
+        "heldout_nll": null,
+        "n_draws": 0,
+        "nll": 0.0,
+        "params": {
+          "w_birthday": 1.3,
+          "w_lucky7": 1.05,
+          "w_recent_winner": 1.05,
+          "w_round_decade": 1.03
+        },
+        "reg": 0.0,
+        "success": false
+      },
       "last_prediction": {
         "combination": [
           32,
-          33,
-          37,
-          38,
-          39,
-          41
+          34,
+          36,
+          41,
+          46,
+          48
         ],
-        "ev_gross": 0.7494026914991976,
-        "ev_net": -2.2505973085008026,
+        "ev_gross": 0.49312267195174075,
+        "ev_net": -2.506877328048259,
         "grand_number": null,
-        "jackpot": 5000000.0,
-        "target_date": "2026-04-17"
+        "jackpot": 2000000.0,
+        "target_date": "2026-05-08"
       }
     },
     "dailygrand": {
+      "fit": {
+        "date": "2026-05-08",
+        "heldout_nll": null,
+        "n_draws": 0,
+        "nll": 0.0,
+        "params": {
+          "w_birthday": 1.3,
+          "w_lucky7": 1.05,
+          "w_recent_winner": 1.05,
+          "w_round_decade": 1.03
+        },
+        "reg": 0.0,
+        "success": false
+      },
       "last_prediction": {
         "combination": [
-          32,
-          33,
+          34,
           36,
+          37,
           38,
           39
         ],
-        "ev_gross": 1.045651969510418,
-        "ev_net": -1.954348030489582,
-        "grand_number": 1,
-        "jackpot": 7000000.0,
-        "target_date": "2026-04-17"
+        "ev_gross": 0.5831255861074578,
+        "ev_net": -2.4168744138925424,
+        "grand_number": 2,
+        "jackpot": 200000.0,
+        "target_date": "2026-05-08"
       }
     },
     "lottomax": {
+      "fit": {
+        "date": "2026-05-08",
+        "heldout_nll": null,
+        "n_draws": 0,
+        "nll": 0.0,
+        "params": {
+          "w_birthday": 1.3,
+          "w_lucky7": 1.05,
+          "w_recent_winner": 1.05,
+          "w_round_decade": 1.03
+        },
+        "reg": 0.0,
+        "success": false
+      },
       "last_prediction": {
         "combination": [
           32,
-          33,
           34,
-          36,
+          37,
           38,
-          39,
-          41
+          44,
+          46,
+          47
         ],
-        "ev_gross": 0.6817907761217661,
-        "ev_net": -4.318209223878234,
+        "ev_gross": 0.2333315258336942,
+        "ev_net": -4.7666684741663055,
         "grand_number": null,
-        "jackpot": 30000000.0,
-        "target_date": "2026-04-17"
+        "jackpot": 5000000.0,
+        "target_date": "2026-05-08"
       }
     }
   }

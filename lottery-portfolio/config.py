@@ -56,6 +56,7 @@ LOTTERY_RULES = {
         "main_max":       52,   # Rule change: LottoMax pool expanded from 50 to 52
         "bonus_max":      52,   # Bonus drawn from the same expanded pool
         "bonus_col":      "bonus",
+        "has_bonus":      False,  # Bonus is machine-drawn, NOT player-picked
         "ticket_cost":    5.00,
         "draws_per_week": 2,    # Tuesday + Friday
     },
@@ -65,6 +66,7 @@ LOTTERY_RULES = {
         "main_max":       49,
         "bonus_max":      49,
         "bonus_col":      "bonus",
+        "has_bonus":      False,  # Bonus is machine-drawn, NOT player-picked
         "ticket_cost":    3.00,
         "draws_per_week": 2,    # Wednesday + Saturday
     },
@@ -74,6 +76,7 @@ LOTTERY_RULES = {
         "main_max":       49,
         "bonus_max":      7,
         "bonus_col":      "grand",
+        "has_bonus":      True,  # Bonus (grand) IS player-picked
         "ticket_cost":    3.00,
         "draws_per_week": 2,    # Monday + Thursday (per OLG)
     },

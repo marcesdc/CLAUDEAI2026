@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-05-02",
+  "last_updated": "2026-05-08",
   "joint_train_count": 20,
   "joint_val_loss": 0.22266,
   "agent_weights": {
     "lottomax": {
-      "alpha": 9.0,
-      "beta": 35.0,
-      "weight": 0.2317301431405659,
-      "draws_scored": 6
+      "alpha": 12.0,
+      "beta": 39.0,
+      "weight": 0.26232564966028155,
+      "draws_scored": 7
     },
     "649": {
       "alpha": 7.0,
@@ -24,8 +24,8 @@
   },
   "last_scores": {
     "lottomax": {
-      "hits": 1,
-      "date": "2026-05-01"
+      "hits": 3,
+      "date": "2026-05-05"
     },
     "649": {
       "hits": 0,

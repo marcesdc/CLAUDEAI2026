@@ -60,8 +60,15 @@ def load_draws(lottery: str) -> pd.DataFrame:
 
 
 def _draws_columns(cfg: dict) -> list[str]:
-    """Expected columns for a draws CSV after normalization."""
-    return ["date"] + [f"n{i}" for i in range(1, cfg["main_count"] + 1)] + ["bonus"]
+    """Expected columns for a draws CSV after normalization.
+
+    Bonus column only required for lotteries where players pick it (Daily Grand).
+    Machine-drawn bonuses (LottoMax, 6/49) are not included.
+    """
+    cols = ["date"] + [f"n{i}" for i in range(1, cfg["main_count"] + 1)]
+    if cfg.get("has_bonus"):  # Only include bonus if players pick it
+        cols.append("bonus")
+    return cols
 
 
 def _validate_draws(df: pd.DataFrame, cfg: dict, lottery: str) -> None:
@@ -83,11 +90,12 @@ def _validate_draws(df: pd.DataFrame, cfg: dict, lottery: str) -> None:
                 f"{lottery}: column {c} has {len(bad)} values outside "
                 f"[1, {cfg['main_max']}]"
             )
-    bad_b = df[(df["bonus"] < 1) | (df["bonus"] > cfg["bonus_max"])]
-    if not bad_b.empty:
-        raise ValueError(
-            f"{lottery}: bonus has {len(bad_b)} values outside [1, {cfg['bonus_max']}]"
-        )
+    if "bonus" in df.columns:
+        bad_b = df[(df["bonus"] < 1) | (df["bonus"] > cfg["bonus_max"])]
+        if not bad_b.empty:
+            raise ValueError(
+                f"{lottery}: bonus has {len(bad_b)} values outside [1, {cfg['bonus_max']}]"
+            )
 
     # No duplicates within a single draw's main numbers
     dup_rows = df[main_cols].apply(lambda r: len(set(r)) != len(r), axis=1)
